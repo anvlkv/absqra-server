@@ -1,0 +1,40 @@
+{
+  "name": "intervey-api",
+  "version": "1.0.0",
+  "description": "api for intervey",
+  "main": "lib/index",
+  "types": "lib/index",
+  "scripts": {
+    "test": "test",
+    "start": "npm run build:live",
+    "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/server/main.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/anvlkv/intervey-api.git"
+  },
+  "keywords": [
+    "intervey"
+  ],
+  "author": "Aleksandr Novolokov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/anvlkv/intervey-api/issues"
+  },
+  "homepage": "https://github.com/anvlkv/intervey-api#readme",
+  "dependencies": {
+    "co-body": "^5.1.1",
+    "http": "0.0.0",
+    "koa": "^2.3.0",
+    "koa-mongo": "^1.2.1",
+    "mongodb": "^2.2.31",
+    "nodemon": "^1.12.1"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.0.39",
+    "@types/node": "^8.0.28",
+    "ts-node": "^3.3.0",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.2"
+  }
+}
