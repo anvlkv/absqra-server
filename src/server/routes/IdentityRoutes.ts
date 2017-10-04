@@ -16,24 +16,4 @@ identitiesRouter.patch('respondents/:respondentId');
 identitiesRouter.delete('users/:userId');
 identitiesRouter.delete('respondents/:respondentId');
 
-// identitiesRouter.get('items/:itemId');
-// identitiesRouter.get('assets/:assetId');
-// identitiesRouter.get('responses/:responseId');
-// identitiesRouter.get('responses/:responseId/:itemId');
-// identitiesRouter.get('responses/:sequenceId/:respondentId');
-// identitiesRouter.get('responses/:sequenceId/:itemId/:respondentId');
-//
-// identitiesRouter.post('sequences');
-// identitiesRouter.post('items');
-// identitiesRouter.post('responses');
-// identitiesRouter.post('responses/:responseId/:itemId');
-// identitiesRouter.post('assets');
-//
-// identitiesRouter.patch('sequences/:sequenceId');
-// identitiesRouter.patch('items/:itemId');
-//
-// identitiesRouter.delete('sequences/:sequenceId');
-// identitiesRouter.delete('items/:itemId');
-// identitiesRouter.delete('assets/:assetId');
-
 export default identitiesRouter;
