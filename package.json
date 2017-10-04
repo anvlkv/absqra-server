@@ -7,7 +7,7 @@
   "scripts": {
     "test": "test",
     "start": "npm run build:live",
-    "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./src/server/main.ts"
+    "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- $NODE_DEBUG_OPTION ./src/server/main.ts"
   },
   "repository": {
     "type": "git",
@@ -23,10 +23,12 @@
   },
   "homepage": "https://github.com/anvlkv/intervey-api#readme",
   "dependencies": {
+    "@types/koa-router": "^7.0.23",
     "co-body": "^5.1.1",
     "http": "0.0.0",
     "koa": "^2.3.0",
     "koa-mongo": "^1.2.1",
+    "koa-router": "^7.2.1",
     "mongodb": "^2.2.31",
     "nodemon": "^1.12.1"
   },

@@ -1,4 +1,8 @@
 import * as Koa from 'koa';
+import interviewerRouter from "./routes/InterviewerRoutes";
+import identitiesRouter from "./routes/IdentityRoutes";
+import respondentRouter from "./routes/RespondentRoutes";
+
 const app = new Koa();
 const port = process.argv[2] || 3000;
 
@@ -24,10 +28,29 @@ app.use(async (ctx, next) => {
 });
 
 // response
+app
+    .use(identitiesRouter.routes())
+    .use(identitiesRouter.allowedMethods());
 
-app.use(async ctx => {
-    ctx.body = 'Hello World';
-});
+app
+    .use(interviewerRouter.routes())
+    .use(interviewerRouter.allowedMethods());
+
+app
+    .use(respondentRouter.routes())
+    .use(respondentRouter.allowedMethods());
+
+
+// app.use(async (ctx, next) => {
+//     // if(ctx.url == '/')
+//     //     ctx.body = 'Hello World';
+//
+//     await next();
+// });
+
+
+
+
 
 app.listen(port, ()=>{
     console.timeEnd('App listening on port '+  port );
