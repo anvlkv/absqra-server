@@ -5,6 +5,7 @@
     "sourceMap": true,
     "outDir": "lib",
     "declaration": true,
+    "experimentalDecorators": true,
     "lib": [
       "ES2015"
     ]

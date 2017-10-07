@@ -31,7 +31,8 @@
     "koa-router": "^7.2.1",
     "mongodb": "^2.2.31",
     "mongoose": "^4.12.0",
-    "nodemon": "^1.12.1"
+    "nodemon": "^1.12.1",
+    "typescript-ioc": "^1.0.2"
   },
   "devDependencies": {
     "@types/koa": "^2.0.39",
