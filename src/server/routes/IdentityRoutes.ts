@@ -9,6 +9,8 @@ identitiesRouter.get('/respondents/:respondentId');
 
 identitiesRouter.post('/users');
 identitiesRouter.post('/respondents');
+identitiesRouter.post('/users/credentials');
+identitiesRouter.post('/respondents/credentials');
 
 identitiesRouter.patch('/users/:userId');
 identitiesRouter.patch('/respondents/:respondentId');

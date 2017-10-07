@@ -1,5 +1,5 @@
 import * as Koa from 'koa';
-
+import * as helmet from 'koa-helmet';
 import interviewerRouter from "./routes/InterviewerRoutes";
 import identitiesRouter from "./routes/IdentityRoutes";
 import respondentRouter from "./routes/RespondentRoutes";
@@ -28,6 +28,8 @@ app.use(async (ctx, next) => {
     const ms = Date.now() - start;
     console.log(`${ctx.method} ${ctx.url} - ${ms}ms`);
 });
+
+app.use(helmet());
 
 // routes
 app

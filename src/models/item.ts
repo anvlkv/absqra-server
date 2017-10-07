@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 
-const ItemSchema = new Schema({
+export const ItemSchema = new Schema({
     name: String,
     description: String,
     question: {type: Schema.Types.ObjectId, ref: 'Asset'},

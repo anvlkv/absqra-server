@@ -8,11 +8,17 @@ export class DataService {
     constructor(
     ){
         console.time('Connected to MongoDB instance');
+	    (<any>mongoose).Promise = global.Promise;
 
-        this.connection = mongoose.createConnection(this.MONGO_URI, {useMongoClient: true});
+	    this.connection = mongoose.createConnection(this.MONGO_URI, {
+	        useMongoClient: true,
+		    promiseLibrary: global.Promise
+	    });
 
         this.connection.on('connected', ()=> {console.timeEnd('Connected to MongoDB instance'); console.time('MongoDB connection terminated')});
         this.connection.on('error', (e)=> console.error('MongoDB connection error: ', e));
         this.connection.on('disconnected', (e)=> console.timeEnd('MongoDB connection terminated'));
     }
 }
+
+export const dataService = new DataService();
