@@ -14,4 +14,6 @@ export class InterviewsService {
         ctx.body = await this.dataService.connection.model('Sequence').find();
         next();
     }
+
+
 }
