@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const AssetSchema = new Schema({
     assetType: {type: String, enum: ['static', 'dynamic']},
-    contentType: {type: String, enum: ['text', 'file', 'remote']},
+    contentType: {type: String, enum: ['text', 'file', 'remote', 'internal:sequence', 'internal:item']},
     source: {type: Schema.Types.ObjectId, ref: 'Item'},
     content: String
 });

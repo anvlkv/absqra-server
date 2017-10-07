@@ -27,6 +27,7 @@
     "http": "0.0.0",
     "koa": "^2.3.0",
     "koa-mongo": "^1.2.1",
+    "koa-mongoose": "^2.0.0",
     "koa-router": "^7.2.1",
     "mongodb": "^2.2.31",
     "mongoose": "^4.12.0",
