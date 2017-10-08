@@ -15,9 +15,15 @@ export class DataService {
 		    promiseLibrary: global.Promise
 	    });
 
-        this.connection.on('connected', ()=> {console.timeEnd('Connected to MongoDB instance'); console.time('MongoDB connection terminated')});
+        this.connection.on('connected', ()=> {
+        	console.timeEnd('Connected to MongoDB instance');
+        	console.time('MongoDB connection terminated')
+        });
         this.connection.on('error', (e)=> console.error('MongoDB connection error: ', e));
-        this.connection.on('disconnected', (e)=> console.timeEnd('MongoDB connection terminated'));
+        this.connection.on('disconnected', (e)=> {
+        	console.timeEnd('MongoDB connection terminated')
+	        console.time('Connected to MongoDB instance');
+        });
     }
 }
 

@@ -12,7 +12,7 @@ export const SequenceSchema = new Schema({
     name: String,
     description: String,
     sequenceMode: {type: String, enum:['select', 'add', 'assign']},
-    sequence: [ItemUseSchema]
+    uses: [ItemUseSchema]
 });
 
 exports.Sequence = mongoose.model('Sequence', SequenceSchema);

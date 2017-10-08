@@ -1,13 +1,11 @@
 import { DataService, dataService } from './dataService';
-import { SequenceSchema } from '../models/sequence';
-import { Document, DocumentQuery } from 'mongoose';
-import { SequenceService } from './sequenceService';
+import { Model, Document } from 'mongoose';
 import { ItemSchema } from '../models/item';
 
 
 export class ItemsService{
     private dataService:DataService;
-    private itemModel: any;
+    private itemModel: Model<any>;
 
     constructor(
     ){
@@ -15,17 +13,18 @@ export class ItemsService{
         this.itemModel = this.dataService.connection.model('Item', ItemSchema);
     }
 
-    itemsList(){
-        return this.itemModel.find()
+    itemsList(): Promise<Document[]>{
+        return this.itemModel.find().exec()
     }
 
-    // sequencesList(): DocumentQuery<Document[], Document>{
-    //     return this.sequenceModel.find();
-    // }
-    //
-    // createSequence(data): Promise<Document[]>{
-    //     console.log(data.body);
-    //     return new this.sequenceModel(data.body);
-    // }
+    createItem(data){
+	    const newItem = new this.itemModel(data);
+	    // this.dataService.connection.collection('items').insertOne(newItem)
+	    return newItem.save();
+    }
+
+    getItem(_id){
+        return this.itemModel.findOne({_id}).populate('assets').exec();
+    }
 
 }
