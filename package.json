@@ -23,7 +23,6 @@
   },
   "homepage": "https://github.com/anvlkv/intervey-api#readme",
   "dependencies": {
-    "@koa/cors": "^2.2.1",
     "co-body": "^5.1.1",
     "http": "0.0.0",
     "koa": "^2.3.0",
@@ -32,10 +31,10 @@
     "koa-mongo": "^1.2.1",
     "koa-mongoose": "^2.0.0",
     "koa-router": "^7.2.1",
-    "mongodb": "^2.2.32",
-    "mongoose": "^4.12.1",
-    "nodemon": "^1.12.1",
-    "typescript-ioc": "^1.0.2"
+    "mongodb": "^2.2.33",
+    "mongoose": "^4.12.2",
+    "mongoose-json-patch": "^1.1.1",
+    "nodemon": "^1.12.1"
   },
   "devDependencies": {
     "@types/koa": "^2.0.39",
@@ -43,8 +42,20 @@
     "@types/mongodb": "^2.2.13",
     "@types/mongoose": "^4.7.23",
     "@types/node": "^8.0.34",
+    "@koa/cors": "^2.2.1",
+    "@types/json-patch": "0.0.30",
     "ts-node": "^3.3.0",
     "tslint": "^5.7.0",
-    "typescript": "^2.5.3"
+    "typescript": "^2.5.3",
+    "typescript-ioc": "^1.0.2",
+    "jasmine-core": "~2.5.2",
+    "jasmine-spec-reporter": "~3.2.0",
+    "karma": "~1.4.1",
+    "karma-chrome-launcher": "~2.0.0",
+    "karma-cli": "~1.0.1",
+    "karma-coverage-istanbul-reporter": "^0.2.0",
+    "karma-jasmine": "~1.1.0",
+    "karma-jasmine-html-reporter": "^0.2.2",
+    "@types/jasmine": "2.5.38"
   }
 }

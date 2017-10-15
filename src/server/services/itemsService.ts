@@ -1,6 +1,7 @@
 import { DataService, dataService } from './dataService';
 import { Model, Document } from 'mongoose';
-import { ItemSchema } from '../models/item';
+import { ItemSchema } from '../../models/item';
+import { Patch } from 'json-patch';
 
 
 export class ItemsService{
@@ -26,5 +27,9 @@ export class ItemsService{
     getItem(_id){
         return this.itemModel.findOne({_id}).populate('assets').exec();
     }
+
+	applyPatch(_id, patch: Patch){
+		return (<any>this.itemModel).findById(_id).patch(patch);
+	}
 
 }

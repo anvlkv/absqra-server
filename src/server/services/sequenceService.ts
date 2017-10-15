@@ -1,13 +1,15 @@
 import { DataService, dataService } from './dataService';
-import { SequenceSchema } from '../models/sequence';
+import { SequenceSchema } from '../../models/sequence';
 import { Document, DocumentQuery, Model } from 'mongoose';
 import { ItemsService } from './itemsService';
+import { Patch } from 'json-patch';
 
 
 export class SequenceService {
     private dataService:DataService;
     private itemsService:ItemsService;
     private sequenceModel: Model<any>;
+
     constructor(
     ){
 	    this.dataService = dataService;
@@ -28,6 +30,24 @@ export class SequenceService {
 
     getSequence(_id): Promise<Document> {
         return this.sequenceModel.findOne({_id}).populate({path:'uses', populate:{path:'item'}}).exec();
+    }
+
+    updateSequence(_id, updateDoc): Promise<Document>{
+    	return this.sequenceModel.findByIdAndUpdate(_id, updateDoc).exec()
+    }
+
+    addItemUse(_id, useDoc): Promise<Document>{
+    	return this.updateSequence(_id, {$push:{uses: useDoc}})
+    }
+
+    updateItemUse(_id, useIndex, useDoc): Promise<Document>{
+    	const $set = {};
+    	$set[`uses.${useIndex}`] = useDoc;
+    	return this.updateSequence(_id, {$set})
+    }
+
+    applyPatch(_id, patch: Patch){
+    	return (<any>this.sequenceModel).findById(_id).patch(patch);
     }
 }
 

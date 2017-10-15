@@ -1,5 +1,5 @@
 import { DataService, dataService } from './dataService';
-import { AssetSchema } from '../models/asset';
+import { AssetSchema } from '../../models/asset';
 import { Model } from 'mongoose';
 
 
