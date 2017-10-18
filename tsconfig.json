@@ -1,18 +1,14 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    "target": "es6",
     "sourceMap": true,
-    "outDir": "dist",
-    "baseUrl": "src",
+    "outDir": "lib",
     "declaration": true,
     "experimentalDecorators": true,
-    "target": "es5",
-    "typeRoots": [
-      "node_modules/@types"
-    ],
+    "emitDecoratorMetadata": true,
     "lib": [
-      "es2016",
-      "dom"
+      "es2015"
     ]
   },
   "exclude": [

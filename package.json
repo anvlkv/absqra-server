@@ -32,22 +32,20 @@
     "koa-mongoose": "^2.0.0",
     "koa-router": "^7.2.1",
     "mongodb": "^2.2.33",
-    "mongoose": "^4.12.2",
+    "mongoose": "~4.11.1",
     "mongoose-json-patch": "^1.1.1",
-    "nodemon": "^1.12.1"
+    "nodemon": "^1.12.1",
+    "typegoose": "^3.5.2"
   },
   "devDependencies": {
+    "@koa/cors": "^2.2.1",
+    "@types/jasmine": "2.5.38",
+    "@types/json-patch": "0.0.30",
     "@types/koa": "^2.0.39",
     "@types/koa-router": "^7.0.23",
     "@types/mongodb": "^2.2.13",
     "@types/mongoose": "^4.7.23",
-    "@types/node": "^8.0.34",
-    "@koa/cors": "^2.2.1",
-    "@types/json-patch": "0.0.30",
-    "ts-node": "^3.3.0",
-    "tslint": "^5.7.0",
-    "typescript": "^2.5.3",
-    "typescript-ioc": "^1.0.2",
+    "@types/node": "^8.0.45",
     "jasmine-core": "~2.5.2",
     "jasmine-spec-reporter": "~3.2.0",
     "karma": "~1.4.1",
@@ -56,6 +54,9 @@
     "karma-coverage-istanbul-reporter": "^0.2.0",
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
-    "@types/jasmine": "2.5.38"
+    "ts-node": "^3.3.0",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.0",
+    "typescript-ioc": "^1.0.2"
   }
 }

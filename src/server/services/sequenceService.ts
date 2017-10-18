@@ -1,54 +1,48 @@
-import { DataService, dataService } from './dataService';
-import { SequenceSchema } from '../../models/sequence';
+import { Sequence, SequenceModel } from '../../models/sequence';
 import { Document, DocumentQuery, Model } from 'mongoose';
 import { ItemsService } from './itemsService';
 import { Patch } from 'json-patch';
 
 
 export class SequenceService {
-    private dataService:DataService;
-    private itemsService:ItemsService;
-    private sequenceModel: Model<any>;
+	private itemsService: ItemsService;
 
-    constructor(
-    ){
-	    this.dataService = dataService;
-	    this.itemsService = new ItemsService();
-	    this.sequenceModel = this.dataService.connection.model('Sequence', SequenceSchema);
-    }
+	constructor(
+	) {
+		this.itemsService = new ItemsService();
+	}
 
-    sequencesList(): DocumentQuery<Document[], Document>{
-        return this.sequenceModel.find();
-    }
+	sequencesList(): DocumentQuery<Document[], Document> {
+		return SequenceModel.find();
+	}
 
-    createSequence(data): Promise<Document>{
-	    const newSeq = new this.sequenceModel(data);
+	createSequence(data): Promise<Document> {
+		// const newSeq = new this.sequenceModel(data);
 
-	    // this.dataService.connection.collection('sequences').insertOne(newSeq);
-        return newSeq.save();
-    }
+		// this.dataService.connection.collection('sequences').insertOne(newSeq);
+		return new SequenceModel(data).save();
+	}
 
-    getSequence(_id): Promise<Document> {
-        return this.sequenceModel.findOne({_id}).populate({path:'uses', populate:{path:'item'}}).exec();
-    }
+	getSequence(_id): Promise<Document> {
+		return SequenceModel.findOne({_id}).populate({path: 'uses', populate: {path: 'item'}}).exec();
+	}
 
-    updateSequence(_id, updateDoc): Promise<Document>{
-    	return this.sequenceModel.findByIdAndUpdate(_id, updateDoc).exec()
-    }
+	updateSequence(_id, updateDoc): Promise<Document> {
+		return SequenceModel.findByIdAndUpdate(_id, updateDoc).exec()
+	}
 
-    addItemUse(_id, useDoc): Promise<Document>{
-    	return this.updateSequence(_id, {$push:{uses: useDoc}})
-    }
+	addItemUse(_id, useDoc): Promise<Document> {
+		return this.updateSequence(_id, {$push: {uses: useDoc}})
+	}
 
-    updateItemUse(_id, useIndex, useDoc): Promise<Document>{
-    	const $set = {};
-    	$set[`uses.${useIndex}`] = useDoc;
-    	return this.updateSequence(_id, {$set})
-    }
+	updateItemUse(_id, useIndex, useDoc): Promise<Document> {
+		const $set = {};
+		$set[`uses.${useIndex}`] = useDoc;
+		return this.updateSequence(_id, {$set})
+	}
 
-    applyPatch(_id, patch: Patch){
-    	return (<any>this.sequenceModel).findById(_id).patch(patch);
-    }
+	applyPatch(_id, patch: Patch) {
+		return (<any>SequenceModel).findById(_id).patch(patch);
+	}
 }
 
-//{"_id":"59da053e9744f83a397fb60e","name":"my new sequence","description":"some description text","sequence":[{"_id":"59da053e9744f83a397fb610"},{"_id":"59da053e9744f83a397fb60f"}]}

@@ -1,22 +1,52 @@
-import * as mongoose from 'mongoose';
-const Schema = mongoose.Schema;
 import * as patcher from 'mongoose-json-patch';
+import { arrayProp, InstanceType, plugin, prop, Ref, Typegoose } from 'typegoose';
+import { Item } from './item';
+import { Model } from 'mongoose';
 
-export  const ItemUseSchema = new Schema({
-    useMode: {type: String, enum:['singular', 'plural']},
-    modifiable: Boolean,
-    assetsVisibilityMode: {type: String, enum:['individual', 'collaborative']},
-    item:{type: Schema.Types.ObjectId, ref: 'Item'},
-    isItemOrigin: Boolean
-});
+export enum UseModes {
+	SINGULAR = 'singular',
+	PLURAL = 'plural'
+}
 
-export const SequenceSchema = new Schema({
-    name: String,
-    description: String,
-    sequenceMode: {type: String, enum:['select', 'add', 'assign']},
-    uses: [ItemUseSchema]
-});
+export enum VisibilityModes {
+	INDIVIDUAL = 'individual',
+	COLLABORATIVE = 'collaborative'
+}
 
-SequenceSchema.plugin(patcher);
+export enum SequenceModes {
+	SELECT = 'select',
+	ADD = 'add',
+	ASSIGN = 'assign'
+}
 
-exports.Sequence = mongoose.model('Sequence', SequenceSchema);
+export class ItemUse {
+	@prop({enum: UseModes})
+	useMode?: UseModes;
+
+	@prop()
+	modifiable: boolean;
+
+	@prop({enum: VisibilityModes, default: VisibilityModes.INDIVIDUAL})
+	assetsVisibilityMode: VisibilityModes;
+
+	@prop({ref: Item})
+	item: Ref<Item>;
+}
+
+
+@plugin(patcher)
+export class Sequence extends Typegoose {
+	@prop()
+	name: string;
+
+	@prop()
+	description?: string;
+
+	@prop({enum: SequenceModes})
+	sequenceMode: SequenceModes;
+
+	@arrayProp({items: ItemUse})
+	uses: ItemUse[];
+}
+
+export const SequenceModel: Model<InstanceType<Sequence>> = new Sequence().getModelForClass(Sequence);

@@ -1,6 +1,5 @@
 {
   "rulesDirectory": [
-    "node_modules/codelyzer"
   ],
   "rules": {
     "callable-types": true,
@@ -18,8 +17,7 @@
     ],
     "import-spacing": true,
     "indent": [
-      true,
-      "spaces"
+      true, "tabs"
     ],
     "interface-over-type-literal": true,
     "label-position": true,
@@ -36,12 +34,7 @@
     "no-arg": true,
     "no-bitwise": true,
     "no-console": [
-      true,
-      "debug",
-      "info",
-      "time",
-      "timeEnd",
-      "trace"
+      false
     ],
     "no-construct": true,
     "no-debugger": true,
