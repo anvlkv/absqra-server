@@ -3,24 +3,24 @@ import { AssetSchema } from '../../models/asset';
 import { Model } from 'mongoose';
 
 
-export class AssetsService{
+export class AssetsService {
 	private dataService: DataService;
 	private assetsModel: Model<any>;
 
-	constructor(){
+	constructor() {
 		this.dataService = dataService;
 		this.assetsModel = this.dataService.connection.model('Asset', AssetSchema);
 	}
 	
-	assetsList(){
+	assetsList() {
 		return this.assetsModel.find().exec();
 	}
 
-	getAssetById(_id){
+	getAssetById(_id) {
 		return this.assetsModel.findOne({_id}).exec();
 	}
 
-	createAsset(data){
+	createAsset(data) {
 		const newAsset = new this.assetsModel(data);
 
 		return newAsset.save();

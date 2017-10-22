@@ -3,10 +3,10 @@ import * as mongoose from 'mongoose';
 export class DataService {
     public connection: mongoose.Connection;
 
-    private MONGO_URI = 'mongodb://intervey-api:Passw0rd!@ds163034.mlab.com:63034/intervey-dev';
+    private MONGO_URI = 'mongodb://intervey-api:another**Pa55w0rd!@ds163034.mlab.com:63034/intervey-dev';
 
     constructor(
-    ){
+    ) {
         console.time('Connected to MongoDB instance');
 	    (<any>mongoose).Promise = global.Promise;
 
