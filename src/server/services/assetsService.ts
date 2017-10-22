@@ -1,21 +1,28 @@
-import { Asset, AssetsModel } from '../../models/asset';
-import { InstanceType } from 'typegoose';
+import { DataService, dataService } from './dataService';
+import { AssetSchema } from '../../models/asset';
+import { Model } from 'mongoose';
 
 
-export class AssetsService {
+export class AssetsService{
+	private dataService: DataService;
+	private assetsModel: Model<any>;
 
-	constructor() {
+	constructor(){
+		this.dataService = dataService;
+		this.assetsModel = this.dataService.connection.model('Asset', AssetSchema);
+	}
+	
+	assetsList(){
+		return this.assetsModel.find().exec();
 	}
 
-	assetsList(): Promise<InstanceType<Asset>[]> {
-		return AssetsModel.find().exec();
+	getAssetById(_id){
+		return this.assetsModel.findOne({_id}).exec();
 	}
 
-	getAssetById(_id): Promise<InstanceType<Asset>> {
-		return AssetsModel.findOne({_id}).exec();
-	}
+	createAsset(data){
+		const newAsset = new this.assetsModel(data);
 
-	createAsset(data) {
-		return new AssetsModel(data).save();
+		return newAsset.save();
 	}
 }

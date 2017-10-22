@@ -1,29 +1,11 @@
-import { InstanceType, prop, Typegoose } from 'typegoose';
-import { Model } from 'mongoose';
+import * as mongoose from 'mongoose';
+const Schema = mongoose.Schema;
 
-export enum AssetTypes {
-	STATIC = 'static',
-	DYNAMIC = 'dynamic'
-}
+export const AssetSchema = new Schema({
+    assetType: {type: String, enum: ['static', 'dynamic']},
+    contentType: {type: String, enum: ['text', 'file', 'remote', 'internal:sequence', 'internal:item']},
+    source: {type: Schema.Types.ObjectId, ref: 'Item'},
+    content: String
+});
 
-export enum ContentTypes {
-	TEXT = 'text',
-	FILE = 'file',
-	REMOTE = 'remote',
-	REF_SEQUENCE = 'ref:sequence',
-	REF_ITEM = 'ref:item'
-}
-
-export class Asset extends Typegoose {
-
-	@prop({enum: AssetTypes})
-	assetType: AssetTypes;
-
-	@prop({enum: ContentTypes})
-	contentType: ContentTypes;
-
-	@prop()
-	content?: string;
-}
-
-export const AssetsModel: Model<InstanceType<Asset>> = new Asset().getModelForClass(Asset);
+exports.Asset = mongoose.model('Asset', AssetSchema);

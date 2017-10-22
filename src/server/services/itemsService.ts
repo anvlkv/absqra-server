@@ -1,30 +1,35 @@
-import { Item, ItemModel } from '../../models/item';
+import { DataService, dataService } from './dataService';
+import { Model, Document } from 'mongoose';
+import { ItemSchema } from '../../models/item';
 import { Patch } from 'json-patch';
-import { InstanceType } from 'typegoose';
 
 
-export class ItemsService {
-	// private itemModel: InstanceType<Item>;
+export class ItemsService{
+    private dataService:DataService;
+    private itemModel: Model<any>;
 
-	constructor(
-	) {
-		// this.itemModel = new ItemModel({});
-	}
+    constructor(
+    ){
+        this.dataService = dataService;
+        this.itemModel = this.dataService.connection.model('Item', ItemSchema);
+    }
 
-	itemsList(): Promise<Item[]> {
-		return ItemModel.find().exec()
-	}
+    itemsList(): Promise<Document[]>{
+        return this.itemModel.find().exec()
+    }
 
-	createItem(data): any {
-		return new ItemModel(data).save();
-	}
+    createItem(data){
+	    const newItem = new this.itemModel(data);
+	    // this.dataService.connection.collection('items').insertOne(newItem)
+	    return newItem.save();
+    }
 
-	getItem(_id): Promise<InstanceType<Item>> {
-		return ItemModel.findOne({_id}).populate('assets').exec();
-	}
+    getItem(_id){
+        return this.itemModel.findOne({_id}).populate('assets').exec();
+    }
 
-	applyPatch(_id, patch: Patch) {
-		return (<any>ItemModel).findById(_id).patch(patch);
+	applyPatch(_id, patch: Patch){
+		return (<any>this.itemModel).findById(_id).patch(patch);
 	}
 
 }
