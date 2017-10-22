@@ -17,11 +17,11 @@ export class SequenceService {
 	    this.sequenceModel = this.dataService.connection.model('Sequence', SequenceSchema);
     }
 
-    sequencesList(): DocumentQuery<Document[], Document>{
-        return this.sequenceModel.find();
+    sequencesList(): Promise<Document[]> {
+        return this.sequenceModel.find().exec();
     }
 
-    createSequence(data): Promise<Document>{
+    createSequence(data): Promise<Document> {
 	    const newSeq = new this.sequenceModel(data);
 
 	    // this.dataService.connection.collection('sequences').insertOne(newSeq);
@@ -29,26 +29,24 @@ export class SequenceService {
     }
 
     getSequence(_id): Promise<Document> {
-        return this.sequenceModel.findOne({_id}).populate({path:'uses', populate:{path:'item'}}).exec();
+        return this.sequenceModel.findOne({_id}).populate({path: 'uses', populate: {path: 'item'}}).exec();
     }
 
-    updateSequence(_id, updateDoc): Promise<Document>{
+    updateSequence(_id, updateDoc): Promise<Document> {
     	return this.sequenceModel.findByIdAndUpdate(_id, updateDoc).exec()
     }
 
-    addItemUse(_id, useDoc): Promise<Document>{
+    addItemUse(_id, useDoc): Promise<Document> {
     	return this.updateSequence(_id, {$push:{uses: useDoc}})
     }
 
-    updateItemUse(_id, useIndex, useDoc): Promise<Document>{
+    updateItemUse(_id, useIndex, useDoc): Promise<Document> {
     	const $set = {};
     	$set[`uses.${useIndex}`] = useDoc;
     	return this.updateSequence(_id, {$set})
     }
 
-    applyPatch(_id, patch: Patch){
+    applyPatch(_id, patch: Patch) {
     	return (<any>this.sequenceModel).findById(_id).patch(patch);
     }
 }
-
-//{"_id":"59da053e9744f83a397fb60e","name":"my new sequence","description":"some description text","sequence":[{"_id":"59da053e9744f83a397fb610"},{"_id":"59da053e9744f83a397fb60f"}]}
