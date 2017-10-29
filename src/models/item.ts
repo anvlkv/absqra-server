@@ -1,7 +1,5 @@
 import * as mongoose from 'mongoose';
 import { AssetSchema } from './asset';
-import * as patcher from 'mongoose-json-patch';
-
 const Schema = mongoose.Schema;
 
 
@@ -13,6 +11,6 @@ export const ItemSchema = new Schema({
     itemMode: {type: String, enum: ['single', 'multiple']},
     assets: [{type: AssetSchema, ref: 'Asset'}]
 });
-ItemSchema.plugin(patcher);
 
-exports.Item = mongoose.model('Item', ItemSchema);
+
+export const Item = mongoose.model('Item', ItemSchema);

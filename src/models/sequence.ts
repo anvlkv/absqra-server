@@ -1,23 +1,12 @@
 import * as mongoose from 'mongoose';
 const Schema = mongoose.Schema;
-import * as patcher from 'mongoose-json-patch';
-import { ItemSchema } from './item';
-
-export const ItemUseSchema = new Schema({
-    useMode: {type: String, enum: ['singular', 'plural']},
-    modifiable: Boolean,
-    assetsVisibilityMode: {type: String, enum: ['individual', 'collaborative']},
-    item: {type: ItemSchema, ref: 'Item'},
-    isItemOrigin: Boolean
-});
+import { ItemUseSchema } from './itemUse';
 
 export const SequenceSchema = new Schema({
     name: String,
     description: String,
     sequenceMode: {type: String, enum: ['select', 'add', 'assign']},
-    uses: [ItemUseSchema]
+    uses: [{type: ItemUseSchema, ref: 'ItemUse'}]
 });
 
-SequenceSchema.plugin(patcher);
-
-exports.Sequence = mongoose.model('Sequence', SequenceSchema);
+export const Sequence = mongoose.model('Sequence', SequenceSchema);

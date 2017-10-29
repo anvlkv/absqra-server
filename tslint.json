@@ -8,7 +8,6 @@
       true,
       "check-space"
     ],
-    "curly": true,
     "eofline": true,
     "forin": true,
     "import-blacklist": [
@@ -33,6 +32,7 @@
     "no-arg": true,
     "no-bitwise": true,
     "no-console": [
+      false
     ],
     "no-construct": true,
     "no-debugger": true,

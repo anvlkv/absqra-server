@@ -1,10 +1,11 @@
 import * as Koa from 'koa';
 import * as helmet from 'koa-helmet';
 import * as cors from '@koa/cors';
-import interviewerRouter from "./routes/InterviewerRoutes";
-import identitiesRouter from "./routes/IdentityRoutes";
-import respondentRouter from "./routes/RespondentRoutes";
+import interviewerRouter from './routes/InterviewerRoutes';
+import identitiesRouter from './routes/IdentityRoutes';
+import respondentRouter from './routes/RespondentRoutes';
 import * as Router from 'koa-router';
+import { mdbConnection } from './middlewears/mdbConnection.middlewear';
 
 
 
@@ -14,12 +15,12 @@ const port = process.argv[2] ? Number(process.argv[2]) : 3000;
 const portShifted = port + 42;
 const metaRouter = new Router();
 
-console.time('App listening on port '+ port);
-console.time('MetaApp listening on port '+  portShifted);
+console.time('App listening on port ' + port);
+console.time('MetaApp listening on port ' +  portShifted);
 
 // x-response-time
 
-function xResponseTyme(){
+function xResponseTyme() {
     return async (ctx, next) => {
 	    const start = Date.now();
 	    await next();
@@ -34,7 +35,7 @@ metaApp.use(xResponseTyme());
 
 // logger
 
-function logger(name){
+function logger(name) {
     return async (ctx, next) => {
         console.time(`${name} - ${ctx.method} ${ctx.url}`);
 	    await next();
@@ -48,29 +49,32 @@ metaApp.use(logger('meta'));
 app.use(helmet());
 metaApp.use(helmet());
 
-//TODO: should know your domains here
-app.use(cors({origin:`*`}));
-metaApp.use(cors({origin:`*`}));
+// TODO: should know your domains here
+app.use(cors({origin: `*`}));
+metaApp.use(cors({origin: `*`}));
 
 
+// connect mongo
+app.use(mdbConnection);
 
-metaRouter.get('/routes', async(ctx, next)=>{
+// serve list of api routes
+metaRouter.get('/routes', async(ctx, next) => {
     const knownRoutes = {
-        respondentRoutes:respondentRouter.stack.map((r) => {
+        respondentRoutes: respondentRouter.stack.map((r) => {
 		    return {
 			    path: r.path,
 			    params: r.paramNames,
                 name: r.name
 		    }
 	    }),
-	    interviewerRoutes:interviewerRouter.stack.map((r) => {
+	    interviewerRoutes: interviewerRouter.stack.map((r) => {
 		    return {
 			    path: r.path,
 			    params: r.paramNames,
 			    name: r.name
 		    }
 	    }),
-	    identityRoutes:identitiesRouter.stack.map((r) => {
+	    identityRoutes: identitiesRouter.stack.map((r) => {
 		    return {
 			    path: r.path,
 			    params: r.paramNames,
@@ -113,12 +117,12 @@ app
 
 
 
-app.listen(port, ()=>{
-    console.timeEnd('App listening on port '+  port );
+app.listen(port, () => {
+    console.timeEnd('App listening on port ' +  port );
 });
 
-metaApp.listen(portShifted, ()=>{
-	console.timeEnd('MetaApp listening on port '+  portShifted);
+metaApp.listen(portShifted, () => {
+	console.timeEnd('MetaApp listening on port ' +  portShifted);
 });
 
 
