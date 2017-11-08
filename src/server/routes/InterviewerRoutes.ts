@@ -1,71 +1,105 @@
 import * as Router from 'koa-router';
 import * as koaBody from 'koa-body';
-import { SequencesMiddlewear } from '../middlewears/sequences.middlewear';
-import { ItemsMiddlewear } from '../middlewears/items.middlewear';
-import { ItemUseMiddlewear } from '../middlewears/ItemUse.middlewear';
-import { AssetsMiddlewear } from '../middlewears/assets.middlewear';
+import { SequenceControllerFactory } from '../controllers/SequencesController';
+import { ItemControllerFactory } from '../controllers/ItemsController';
+import { ItemUseControllerFactory } from '../controllers/ItemUsesController';
+import { ItemUse } from '../../entity/ItemUse';
+import { Sequence } from '../../entity/Sequence';
 
-const interviewerRouter = new Router();
-const sequences = new SequencesMiddlewear();
-const uses = new ItemUseMiddlewear();
-const items = new ItemsMiddlewear();
-const assets = new AssetsMiddlewear();
 
-interviewerRouter.get('getSequences', '/sequences', sequences.list);
-interviewerRouter.get('getSequence', '/sequences/:sequenceId', sequences.one);
+export const interviewerRouter = new Router();
 
-interviewerRouter.get('getItems', '/items', items.list);
-interviewerRouter.get('getItem', '/items/:itemId', items.one);
 
-interviewerRouter.get('getAssets', '/assets', assets.list);
-interviewerRouter.get('getAsset', '/assets/:assetId', assets.one);
+(async () => {
+	const Sequences =  await SequenceControllerFactory();
+	const Items = await ItemControllerFactory();
+	const ItemUses = await ItemUseControllerFactory();
+
+	interviewerRouter.get('getSequences', '/Sequences', Sequences.list);
+	interviewerRouter.get('getSequence', '/Sequences/:sequenceId', Sequences.one);
+
+// interviewerRouter.get('getItems', '/items', items.list);
+// interviewerRouter.get('getItem', '/items/:itemId', items.one);
+
+	interviewerRouter.get('getAssets', '/assets', );
+	interviewerRouter.get('getAsset', '/assets/:assetId', );
 
 // interviewerRouter.get('/responses/:responseId');
 // interviewerRouter.get('/responses/:responseId/:itemId');
 // interviewerRouter.get('/responses/:sequenceId/:respondentId');
 // interviewerRouter.get('/responses/:sequenceId/:itemId/:respondentId');
 
-interviewerRouter.post('addSequence', '/sequences', koaBody(), sequences.create);
+	interviewerRouter.post('addSequence', '/Sequences', koaBody(), Sequences.create);
 
-interviewerRouter.post('addNewItemToSequence', '/sequences/:sequenceId', koaBody(), async (ctx, next) => {
-	await items.create(ctx);
-	ctx.request.body = {
-		item: await ctx.body,
-		isItemOrigin: true
-	};
+	interviewerRouter.post('addNewItemToSequence', '/Sequences/:sequenceId', koaBody(), async (ctx, next) => {
+		await Sequences.one(ctx);
+		const sequence = ctx.body;
 
-	await uses.create(ctx);
-	ctx.request.body = {$push: {uses: ctx.body}};
+		ctx.request.body = <ItemUse> {
+			item: ctx.request.body,
+			sequence: sequence
+		};
+
+		await ItemUses.create(ctx);
+
+		const newUse = ctx.body;
 
 
-	await sequences.update(ctx);
-	next();
-});
 
-interviewerRouter.post('/responses');
-interviewerRouter.post('/responses/:responseId/:itemId');
-interviewerRouter.post('addAsset', '/assets', koaBody(), assets.create);
+		ctx.request.body = <Sequence> {
+			...sequence,
+			use: sequence.use ? [...sequence.use, newUse] : [newUse]
+		};
 
-interviewerRouter.patch('updateSequence', '/sequences/:sequenceId', koaBody(), async (ctx) => {
-	// ctx.body = await sequenceService.applyPatch(ctx.params.sequenceId, ctx.request.body)
-});
+		await Sequences.update(ctx, next);
 
-interviewerRouter.patch('updateItem', '/items/:itemId', koaBody(), items.update);
+		await Sequences.one(ctx, next);
+	});
 
-interviewerRouter.patch('updateUse', '/sequences/:sequenceId/uses/:useIndex', koaBody(), async (ctx) => {
-	// ctx.body = await itemsService.applyPatch(ctx.params.itemID, ctx.request.body)
-});
+	interviewerRouter.post('/responses');
+	interviewerRouter.post('/responses/:responseId/:itemId');
+	interviewerRouter.post('addAsset', '/assets', koaBody(), );
 
-interviewerRouter.delete('/sequences/:sequenceId');
-interviewerRouter.delete('deleteItem', '/items/:itemId', async(ctx) => {
-	// TODO: Delete item from db and clear refs
-	ctx.body = ctx.params.itemId
-});
-interviewerRouter.delete('removeItem', 'sequences/:sequenceId/:itemId', async(ctx) => {
-	// TODO: remove item use
-	ctx.body = ctx.params.itemId
-});
+	interviewerRouter.patch('updateSequenceHeader', '/Sequences/:sequenceId', koaBody(), async (ctx, next) => {
+		// ctx.body = await sequenceService.applyPatch(ctx.params.sequenceId, ctx.request.body)
 
-interviewerRouter.delete('/assets/:assetId');
+		// const headerProps = ['name', 'description', 'sequenceMode'];
+		//
+		// const updatedHeader = {};
+		//
+		// for (const prop in ctx.request.body) {
+		// 	if (headerProps.find(p => p === prop)) {
+		// 		updatedHeader[prop] = ctx.request.body[prop]
+		// 	}
+		// }
+		//
+		// ctx.request.body = updatedHeader;
+		//
+		// ctx.body = await Sequences.update(ctx, next);
+		await Sequences.update(ctx, next);
+	});
 
-export default interviewerRouter;
+	interviewerRouter.patch('updateItem', '/items/:itemId', koaBody(), async (ctx, next) => {
+		// ctx.request.body.assets = ctx.request.body.assets.map(async (asset, index) => {
+		// 	return await assets.upsert({request: {body: asset}})
+		// });
+		// next();
+	}, );
+
+	interviewerRouter.patch('updateUse', '/Sequences/:sequenceId/uses/:useIndex', koaBody(), async (ctx) => {
+		// ctx.body = await itemsService.applyPatch(ctx.params.itemID, ctx.request.body)
+	});
+
+	interviewerRouter.delete('/Sequences/:sequenceId');
+	interviewerRouter.delete('deleteItem', '/items/:itemId', async(ctx) => {
+		// TODO: Delete item from db and clear refs
+		ctx.body = ctx.params.itemId
+	});
+	interviewerRouter.delete('removeItem', 'Sequences/:sequenceId/:itemId', async(ctx) => {
+		// TODO: remove item use
+		ctx.body = ctx.params.itemId
+	});
+
+	interviewerRouter.delete('/assets/:assetId');
+})();
+
