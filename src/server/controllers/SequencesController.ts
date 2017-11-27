@@ -1,6 +1,5 @@
-import { createConnection, getConnection, getManager } from 'typeorm';
+import { getManager } from 'typeorm';
 import { Sequence } from '../../entity/Sequence';
-import { Context } from 'koa';
 
 export class SequencesController {
 	constructor (
@@ -18,7 +17,7 @@ export class SequencesController {
 	async one(ctx, next?) {
 		const SequencesRepository = getManager().getRepository(Sequence);
 
-		ctx.body = await SequencesRepository.findOneById(ctx.params.sequenceId);
+		ctx.body = await SequencesRepository.findOne(ctx.params.sequenceId);
 
 		if (next) next();
 	}
@@ -33,18 +32,6 @@ export class SequencesController {
 		if (next) next();
 	}
 
-	async update(ctx, next?) {
-		await getConnection()
-		.createQueryBuilder()
-		.update(Sequence)
-		.set(ctx.request.body)
-		.where('id = :id', { id: ctx.params.sequenceId })
-		.execute();
-
-		ctx.body = await this.one(ctx);
-
-		if (next) next();
-	}
 
 	async save(ctx, next?) {
 		const SequencesRepository = getManager().getRepository(Sequence);

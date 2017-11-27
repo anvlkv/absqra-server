@@ -1,32 +1,33 @@
-import { Column, JoinColumn, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+	AfterLoad, Column, CreateDateColumn, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany,
+	PrimaryGeneratedColumn, UpdateDateColumn,
+} from 'typeorm';
 import { Entity } from 'typeorm/decorator/entity/Entity';
-import { ItemUse } from './ItemUse';
+import { Step } from './Step';
+import { Base } from './base';
 
 
-export enum SequenceModes {
-	SELECT = 'select',
-	ADD = 'add',
-	ASSIGN = 'assign'
-}
-
-@Entity()
-export class Sequence {
-	@PrimaryGeneratedColumn()
-	id: number;
-
+@Entity({
+	// orderBy: {
+	// 	updatedDate: 'DESC',
+	// }
+})
+export class Sequence extends Base {
 	@Column({type: 'char', length: 256})
 	name: string;
 
 	@Column({type: 'char', length: 2000, nullable: true})
-	description: string;
+	description?: string;
 
-	@Column({type: 'char', length: 32, default: SequenceModes.ADD})
-	sequenceMode: SequenceModes;
-
-	@OneToMany(type => ItemUse, use => use.sequence, {
-		cascadeInsert: true,
-		cascadeUpdate: true
+	@OneToMany(type => Step, itemUSe => itemUSe.sequence, {
+		cascade: true,
+		eager: true
 	})
 	@JoinTable()
-	use: ItemUse[];
+	steps: Step[];
+
+	@AfterLoad()
+	sortSteps() {
+		this.steps.sort((s1, s2) => s1.order - s2.order);
+	}
 }

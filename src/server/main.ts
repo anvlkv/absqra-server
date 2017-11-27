@@ -7,6 +7,7 @@ import { interviewerRouter } from './routes/InterviewerRoutes';
 import { identitiesRouter } from './routes/IdentityRoutes';
 import { respondentRouter } from './routes/RespondentRoutes';
 import { metaRouter } from './routes/MetaRoutes';
+import { fixture } from './fixture';
 
 
 const port = process.argv[2] ? Number(process.argv[2]) : 3000;
@@ -42,6 +43,8 @@ function logger(name) {
 	const metaApp = new Koa();
 
 	console.timeEnd('Connected to PostgresSQL instance');
+
+	fixture()();
 
 	app.use(xResponseTime());
 	metaApp.use(xResponseTime());

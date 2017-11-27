@@ -8,7 +8,7 @@
       "test": "test",
       "start": "ts-node src/server/main.ts",
       "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- $NODE_DEBUG_OPTION ./src/server/main.ts",
-      "restart:db": "psql -f sqlScripts/restart.sql -v datname=\"interveydev\" -v username=\"interveyapi\" -v datnameQ=\"'interveyapi'\""
+      "restart:db": "psql -f sqlScripts/restart.sql -v datname=\"interveydev\" -v username=\"interveyapi\" -v datnameQ=\"'interveyapi'\"; rm ormlogs.log"
    },
    "repository": {
       "type": "git",
@@ -26,29 +26,25 @@
    "dependencies": {
       "co-body": "^5.1.1",
       "http": "0.0.0",
-      "koa": "^2.3.0",
+      "koa": "^2.4.1",
       "koa-body": "^2.5.0",
-      "koa-helmet": "^3.2.0",
-      "koa-mongo": "^1.2.1",
-      "koa-mongoose": "git+ssh://git@github.com/anvlkv/koa-mongoose.git",
-      "koa-router": "^7.2.1",
+      "koa-helmet": "^3.3.0",
+      "koa-router": "^7.3.0",
       "mongodb": "^2.2.31",
-      "mongoose": "^4.12.4",
+      "mongoose": "^4.13.5",
       "mysql": "^2.15.0",
       "nodemon": "^1.12.1",
       "pg": "^7.4.0",
       "reflect-metadata": "^0.1.10",
-      "typeorm": "0.1.2"
+      "typeorm": "^0.2.0-alpha.7"
    },
    "devDependencies": {
       "@koa/cors": "^2.2.1",
       "@types/jasmine": "2.5.38",
       "@types/json-patch": "0.0.30",
-      "@types/koa": "^2.0.39",
-      "@types/koa-router": "^7.0.23",
-      "@types/mongodb": "^2.2.15",
-      "@types/mongoose": "^4.7.24",
-      "@types/node": "^8.0.29",
+      "@types/koa": "^2.0.41",
+      "@types/koa-router": "^7.0.26",
+      "@types/node": "^8.0.53",
       "jasmine-core": "~2.5.2",
       "jasmine-spec-reporter": "~3.2.0",
       "karma": "~1.4.1",

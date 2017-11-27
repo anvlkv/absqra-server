@@ -1,5 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinTable } from 'typeorm';
-import { Item } from './Item';
+import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Base } from './base';
 
 export enum AssetTypes {
     STATIC = 'static',
@@ -10,16 +10,15 @@ export enum AssetContentTypes {
     TEXT = 'text',
     FILE = 'file',
     URL = 'url',
-    INT_SEQUENCE = 'internal:sequence',
-    INT_ITEM = 'internal:item'
+    SUBSET = 'subset'
 }
 
 
 @Entity()
-export class Asset {
+export class Asset extends Base {
 
     @PrimaryGeneratedColumn()
-    id: number;
+    id?: number;
 
     @Column({type: 'char', length: 32, default: AssetTypes.STATIC})
     assetType: AssetTypes;
@@ -28,10 +27,18 @@ export class Asset {
     contentType: AssetContentTypes;
 
     @Column({type: 'char', length: 2000, nullable: true})
-    content: string;
+    content?: string;
 
-    @ManyToOne(type => Item)
+	@ManyToOne(type => Asset, asset => asset.subset, {
+		nullable: true
+	})
+	@JoinColumn()
+	containedInAsset?: Asset;
+
+	@OneToMany(type => Asset, asset => asset.containedInAsset, {
+		cascade: true
+	})
     @JoinTable()
-    questionOf: Item;
+	subset?: Asset[];
 }
 

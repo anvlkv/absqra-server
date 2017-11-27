@@ -18,7 +18,7 @@ export class ItemsController {
 	async one(ctx, next?) {
 		const ItemsRepository = getManager().getRepository(Item);
 
-		ctx.body = await ItemsRepository.findOneById(ctx.params.sequenceId);
+		ctx.body = await ItemsRepository.findOne(ctx.params.itemId);
 
 		if (next) next();
 	}
@@ -33,15 +33,15 @@ export class ItemsController {
 		if (next) next();
 	}
 
-	async update(ctx, next?) {
-		await getConnection()
-		.createQueryBuilder()
-		.update(Item)
-		.set(ctx.request.body)
-		.where('id = :id', { _id: ctx.params.itemId })
-		.execute();
+	async save(ctx, next?) {
+		const ItemsRepository = getManager().getRepository(Item);
 
-		ctx.body = await this.one(ctx);
+		if (ctx.request.body.id) {
+			await ItemsRepository.update(ctx.request.body.id, ctx.request.body);
+		}
+		else {
+			await ItemsRepository.save(ctx.request.body);
+		}
 
 		if (next) next();
 	}
