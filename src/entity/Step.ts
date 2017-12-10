@@ -15,8 +15,6 @@ export enum LogicTypes {
 
 @Entity()
 export class Step extends Base {
-	@PrimaryGeneratedColumn()
-	id?: number;
 
 	@Column({type: 'integer'})
 	order?: number;

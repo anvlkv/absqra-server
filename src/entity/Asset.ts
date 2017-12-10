@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { Base } from './base';
+import { Item } from './Item';
 
 export enum AssetTypes {
     STATIC = 'static',
@@ -16,9 +17,6 @@ export enum AssetContentTypes {
 
 @Entity()
 export class Asset extends Base {
-
-    @PrimaryGeneratedColumn()
-    id?: number;
 
     @Column({type: 'char', length: 32, default: AssetTypes.STATIC})
     assetType: AssetTypes;
@@ -38,7 +36,10 @@ export class Asset extends Base {
 	@OneToMany(type => Asset, asset => asset.containedInAsset, {
 		cascade: true
 	})
-    @JoinTable()
+	@JoinTable()
 	subset?: Asset[];
+
+	@ManyToOne(type => Item, 'assets')
+	item?: Item;
 }
 

@@ -3,10 +3,10 @@ import * as helmet from 'koa-helmet';
 import * as cors from '@koa/cors';
 import { createConnection } from 'typeorm';
 
-import { interviewerRouter } from './routes/InterviewerRoutes';
-import { identitiesRouter } from './routes/IdentityRoutes';
-import { respondentRouter } from './routes/RespondentRoutes';
-import { metaRouter } from './routes/MetaRoutes';
+import { interviewerRouter } from './actions/InterviewerActions';
+import { identitiesRouter } from './actions/IdentityRoutes';
+import { respondentRouter } from './actions/RespondentRoutes';
+import { metaRouter } from './actions/MetaRoutes';
 import { fixture } from './fixture';
 
 

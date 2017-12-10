@@ -19,7 +19,7 @@ export class Sequence extends Base {
 	@Column({type: 'char', length: 2000, nullable: true})
 	description?: string;
 
-	@OneToMany(type => Step, itemUSe => itemUSe.sequence, {
+	@OneToMany(type => Step, step => step.sequence, {
 		cascade: true,
 		eager: true
 	})
@@ -27,7 +27,7 @@ export class Sequence extends Base {
 	steps: Step[];
 
 	@AfterLoad()
-	sortSteps() {
+	sortSteps?() {
 		this.steps.sort((s1, s2) => s1.order - s2.order);
 	}
 }

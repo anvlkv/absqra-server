@@ -21,9 +21,6 @@ export enum QuantityOrder {
 @Entity()
 export class Item extends Base {
 
-	@PrimaryGeneratedColumn()
-	id?: number;
-
 	@Column({type: 'char', length: 256, nullable: true})
 	name?: string;
 
@@ -46,15 +43,16 @@ export class Item extends Base {
 	@Column({type: 'char', length: 32, default: ItemLifeCycleTypes.ONE_ONE})
 	lifeCycle: ItemLifeCycleTypes;
 
-	@ManyToMany(type => FormatConstraint, {
+	@OneToMany(type => FormatConstraint, fc => fc.item, {
 		cascade: true,
 		eager: true
 	})
 	@JoinTable()
-	formatConstraints: FormatConstraint[];
+	formatConstraints?: FormatConstraint[];
 
-	@ManyToMany(type => Asset, {
+	@OneToMany(type => Asset, asset => asset.item, {
 		cascade: true,
+		eager: true
 	})
 	@JoinTable()
 	assets?: Asset[];

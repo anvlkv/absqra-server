@@ -3,7 +3,7 @@
 // import { Step } from '../../models/itemUse';
 // import { Sequence } from '../../models/sequence';
 import { respondentRouter } from './RespondentRoutes';
-import { interviewerRouter } from './InterviewerRoutes';
+import { interviewerRouter } from './InterviewerActions';
 import { identitiesRouter } from './IdentityRoutes';
 import * as Router from 'koa-router';
 import { AssetContentTypes, AssetTypes } from '../../entity/Asset';
