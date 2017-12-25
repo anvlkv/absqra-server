@@ -2,6 +2,7 @@ import { Entity, Column, ManyToMany, JoinTable, PrimaryGeneratedColumn, OneToMan
 import { Asset } from './Asset';
 import { FormatConstraint } from './FormatConstraint';
 import { Base } from './base';
+import { QuestionAsset } from './QuestionAsset';
 
 
 export enum ItemLifeCycleTypes {
@@ -14,8 +15,7 @@ export enum ItemLifeCycleTypes {
 export enum QuantityOrder {
 	NONE = 'none',
 	ONE = 'one',
-	MULTIPLE = 'multiple',
-	NDIMENSIONAL = 'ndimensional',
+	MULTIPLE = 'multiple'
 }
 
 @Entity()
@@ -27,12 +27,12 @@ export class Item extends Base {
 	@Column({type: 'char', length: 2000, nullable: true})
 	description?: string;
 
-	@OneToOne(type => Asset, {
+	@OneToOne(type => QuestionAsset, {
 		cascade: true,
 		eager: true,
 	})
 	@JoinColumn()
-	question: Asset;
+	question: QuestionAsset;
 
 	@Column({type: 'char', length: 32, default: QuantityOrder.NONE})
 	offers: QuantityOrder;
@@ -47,14 +47,14 @@ export class Item extends Base {
 		cascade: true,
 		eager: true
 	})
-	@JoinTable()
+	@JoinTable({name: 'constraints_of_item'})
 	formatConstraints?: FormatConstraint[];
 
 	@OneToMany(type => Asset, asset => asset.item, {
 		cascade: true,
 		eager: true
 	})
-	@JoinTable()
+	@JoinTable({name: 'assets_of_item'})
 	assets?: Asset[];
 }
 

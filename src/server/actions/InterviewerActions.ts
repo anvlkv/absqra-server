@@ -96,7 +96,6 @@ export const interviewerRouter = new Router();
 
 	interviewerRouter.post('addAssetToItem', '/items/:itemId/assets', koaBody(), async (ctx, next) => {
 		const Items =  getConnection().getRepository(Item);
-
 		const item = await Items.findOne(ctx.params.itemId);
 
 		// await Assets.create(ctx);
@@ -104,7 +103,7 @@ export const interviewerRouter = new Router();
 
 		item.assets = item.assets ? [...item.assets, asset] : [asset];
 
-		await Items.update({id: item.id}, item);
+		await Items.save(item);
 
 		ctx.body = asset;
 	});
@@ -119,7 +118,7 @@ export const interviewerRouter = new Router();
 
 		item.formatConstraints = item.formatConstraints ? [...item.formatConstraints, constraint] : [constraint];
 
-		await Items.update({id: item.id}, item);
+		await Items.save(item);
 
 		ctx.body = constraint;
 	});
@@ -154,7 +153,8 @@ export const interviewerRouter = new Router();
 			...ctx.request.body
 		};
 
-		ctx.body = await Items.update({id: ctx.params.itemId}, item);
+		await Items.save(item);
+		ctx.body = await Items.findOne(item.id);
 	});
 
 	interviewerRouter.patch('updateStep', '/Sequences/:sequenceId/steps/:stepId', koaBody(), async (ctx, next) => {

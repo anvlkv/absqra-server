@@ -40,22 +40,6 @@ export function fixture() {
 							contentType: AssetContentTypes.TEXT,
 							content: 'blah blah'
 						},
-						// {
-						// 	assetType: AssetTypes.STATIC,
-						// 	contentType: AssetContentTypes.SUBSET,
-						// 	// subset: [
-						// 	// 	{
-						// 	// 		assetType: AssetTypes.STATIC,
-						// 	// 		contentType: AssetContentTypes.TEXT,
-						// 	// 		content: 'blah blah 2'
-						// 	// 	},
-						// 	// 	{
-						// 	// 		assetType: AssetTypes.STATIC,
-						// 	// 		contentType: AssetContentTypes.TEXT,
-						// 	// 		content: 'blah blah 3'
-						// 	// 	},
-						// 	// ]
-						// }
 					],
 					formatConstraints: [
 						{
