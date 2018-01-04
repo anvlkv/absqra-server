@@ -1,4 +1,4 @@
-import { AfterLoad, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { AfterLoad, BeforeInsert, Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 export abstract class Base {
 	@PrimaryGeneratedColumn()
@@ -28,4 +28,9 @@ export abstract class Base {
 			}
 		}
 	}
+}
+
+export abstract class OrderableBase extends Base {
+	@Column({type: 'integer'})
+	order?: number;
 }

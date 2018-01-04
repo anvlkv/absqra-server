@@ -5,7 +5,7 @@ import { createConnection } from 'typeorm';
 
 import { interviewerRouter } from './actions/InterviewerActions';
 import { identitiesRouter } from './actions/IdentityRoutes';
-import { respondentRouter } from './actions/RespondentRoutes';
+import { respondentRouter } from './actions/RespondentActions';
 import { metaRouter } from './actions/MetaRoutes';
 import { fixture } from './fixture';
 
@@ -17,7 +17,7 @@ console.time('App listening on port ' + port);
 console.time('MetaApp listening on port ' +  portShifted);
 console.time('Connected to PostgresSQL instance');
 
-// x-response-time
+
 function xResponseTime() {
     return async (ctx, next) => {
 	    const start = Date.now();
@@ -27,7 +27,7 @@ function xResponseTime() {
     }
 }
 
-// logger
+
 function logger(name) {
     return async (ctx, next) => {
         console.time(`${name} - ${ctx.method} ${ctx.url}`);
@@ -35,6 +35,30 @@ function logger(name) {
 	    console.timeEnd(`${name} - ${ctx.method} ${ctx.url}`);
     }
 }
+
+function trimmer() {
+	function trimObject (obj) {
+		if (!obj) {
+			return;
+		}
+
+		for (const k of Object.keys(obj)) {
+			if (typeof obj[k] === 'string') {
+				obj[k] = <String>(obj[k]).trim();
+			}
+			else if (typeof obj[k] === 'object') {
+				obj[k] = trimObject(obj[k])
+			}
+		}
+		return obj;
+	}
+
+	return async (ctx, next) => {
+		await next();
+		ctx.body = trimObject(ctx.body);
+	}
+}
+
 
 
 (async() => {
@@ -58,6 +82,10 @@ function logger(name) {
 // TODO: should know your domains here
 	app.use(cors({origin: `*`}));
 	metaApp.use(cors({origin: `*`}));
+
+	app.use(trimmer());
+	metaApp.use(trimmer());
+
 
 	// routes
 	metaApp

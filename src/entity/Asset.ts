@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
-import { Base } from './base';
+import { OrderableBase } from './base';
 import { Item } from './Item';
 
 export enum AssetTypes {
@@ -14,17 +14,20 @@ export enum AssetContentTypes {
 }
 
 @Entity()
-export class Asset extends Base {
+export class Asset extends OrderableBase {
 	@Column({type: 'char', length: 32, default: AssetTypes.STATIC})
-	assetType: AssetTypes;
+	assetType?: AssetTypes;
 
 	@Column({type: 'char', length: 32, default: AssetContentTypes.TEXT})
-	contentType: AssetContentTypes;
+	contentType?: AssetContentTypes;
 
 	@Column({type: 'char', length: 2000, nullable: true})
 	content?: string;
 
 	@ManyToOne(type => Item, item => item.assets)
 	item?: Item;
+
+	isGenerated?: boolean;
+	source?: string;
 }
 

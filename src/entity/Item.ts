@@ -1,4 +1,7 @@
-import { Entity, Column, ManyToMany, JoinTable, PrimaryGeneratedColumn, OneToMany, JoinColumn, OneToOne, ManyToOne } from 'typeorm';
+import {
+	Entity, Column, ManyToMany, JoinTable, PrimaryGeneratedColumn, OneToMany, JoinColumn, OneToOne, ManyToOne,
+	AfterLoad,
+} from 'typeorm';
 import { Asset } from './Asset';
 import { FormatConstraint } from './FormatConstraint';
 import { Base } from './base';
@@ -56,5 +59,12 @@ export class Item extends Base {
 	})
 	@JoinTable({name: 'assets_of_item'})
 	assets?: Asset[];
+
+	@AfterLoad()
+	sortAssets?() {
+		if (this.assets) {
+			this.assets.sort((a1, a2) => a1.order - a2.order);
+		}
+	}
 }
 

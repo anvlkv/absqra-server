@@ -1,10 +1,11 @@
 import {
-	AfterLoad, Column, CreateDateColumn, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany,
+	AfterLoad, Column, CreateDateColumn, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne,
 	PrimaryGeneratedColumn, UpdateDateColumn,
 } from 'typeorm';
 import { Entity } from 'typeorm/decorator/entity/Entity';
 import { Step } from './Step';
 import { Base } from './base';
+import { SequenceHeader } from './SequenceHeader';
 
 
 @Entity({
@@ -13,21 +14,24 @@ import { Base } from './base';
 	// }
 })
 export class Sequence extends Base {
-	@Column({type: 'char', length: 256})
-	name: string;
-
-	@Column({type: 'char', length: 2000, nullable: true})
-	description?: string;
+	@OneToOne(type => SequenceHeader, {
+		eager: true,
+		cascade: true
+	})
+	@JoinColumn()
+	header?: SequenceHeader;
 
 	@OneToMany(type => Step, step => step.sequence, {
 		cascade: true,
 		eager: true
 	})
 	@JoinTable()
-	steps: Step[];
+	steps?: Step[];
 
 	@AfterLoad()
 	sortSteps?() {
-		this.steps.sort((s1, s2) => s1.order - s2.order);
+		if (this.steps) {
+			this.steps.sort((s1, s2) => s1.order - s2.order);
+		}
 	}
 }

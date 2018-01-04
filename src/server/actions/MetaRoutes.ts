@@ -2,7 +2,7 @@
 // import { Item } from '../../models/item';
 // import { Step } from '../../models/itemUse';
 // import { Sequence } from '../../models/sequence';
-import { respondentRouter } from './RespondentRoutes';
+import { respondentRouter } from './RespondentActions';
 import { interviewerRouter } from './InterviewerActions';
 import { identitiesRouter } from './IdentityRoutes';
 import * as Router from 'koa-router';

@@ -7,7 +7,6 @@
    "database": "interveydev",
    "synchronize": true,
    "logging": true,
-   "logger": "file",
    "entities": [
       "src/entity/**/*.ts"
    ],
