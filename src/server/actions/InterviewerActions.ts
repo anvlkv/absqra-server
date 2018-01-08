@@ -132,6 +132,20 @@ interviewerRouter.post('addAssetToItem', '/items/:itemId/assets', koaBody(), asy
 	ctx.body = asset;
 });
 
+interviewerRouter.post('setItemQuestion', '/items/:itemId/question', koaBody(), async (ctx, next) => {
+	const Items =  getConnection().getRepository(Item);
+	const item = await Items.findOne(ctx.params.itemId);
+
+	// await Assets.create(ctx);
+	item.question = new QuestionAsset({
+		...ctx.request.body,
+	});
+
+	await Items.save(item);
+
+	ctx.body = item.question;
+});
+
 interviewerRouter.post('addConstraintToItem', '/items/:itemId/formatConstraints', koaBody(), async (ctx, next) => {
 	const Items =  getConnection().getRepository(Item);
 

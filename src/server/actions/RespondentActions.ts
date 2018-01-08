@@ -9,40 +9,53 @@ import { ValidationTypes } from '../../entity/FormatConstraint';
 
 export const respondentRouter = new Router();
 
+
+respondentRouter.get('getSequencesThatCanBeAnswered', '/sequences-that-can-be-answered', async (ctx, next) => {
+	const Sequences = getConnection().getRepository(Sequence);
+
+	ctx.body = await Sequences.find();
+});
+
 respondentRouter.get('getSequence', '/:sequenceId', async (ctx, next) => {
 	const sequence = await getConnection().getRepository(Sequence).findOne(ctx.params.sequenceId);
-	let responseId = ctx.cookies.get('responseId');
 	let sequenceResponse;
-	if (!responseId) {
+
+	if (!ctx.session.responseId) {
 		sequenceResponse = await getConnection().getRepository(SequenceResponse).save(new SequenceResponse({
 				sequence: {
 					id: ctx.params.sequenceId
 				}
 			}));
 
-		responseId = String(sequenceResponse.id);
-		ctx.cookies.set('responseId', responseId);
+		ctx.session.responseId = String(sequenceResponse.id);
 	}
 	else {
-		sequenceResponse = await getConnection().getRepository(SequenceResponse).findOne(responseId);
+		sequenceResponse = await getConnection().getRepository(SequenceResponse).findOne(ctx.session.responseId);
 	}
 
-	if (sequenceResponse.stepResponses.length > 0) {
+	if (sequenceResponse && sequenceResponse.stepResponses && sequenceResponse.stepResponses.length > 0) {
 		sequence.steps = sequence.steps.filter(step => !!sequenceResponse.stepResponses.find(sr => sr.step.id === step.id))
 	}
-
-
 	ctx.body = sequence;
 });
 
-respondentRouter.get('getItem', '/:sequenceId/:stepId', async (ctx, next) => {
+respondentRouter.get('getStep', '/:sequenceId/:stepId', async (ctx, next) => {
 	const Sequences = await getConnection().getRepository(Sequence);
 
 	const sequence = await Sequences.findOne(ctx.params.sequenceId);
 
+	const response = await getConnection().getRepository(SequenceResponse).findOne(ctx.session.responseId);
+
 	const requestedStep = sequence.steps.find(s => s.id == ctx.params.stepId);
 
-	ctx.body = await prepareStepForResponse(requestedStep, ctx.cookies.get('responseId'));
+	const adjustedStepId  = adjustStepId(sequence, requestedStep, response);
+
+	if (requestedStep.id != adjustedStepId) {
+		ctx.redirect(`/${ctx.params.sequenceId}/${adjustedStepId}`);
+		next();
+	}
+
+	ctx.body = await prepareStepForResponse(requestedStep, ctx.session.responseId);
 });
 
 respondentRouter.post('/:sequenceId');
@@ -52,12 +65,35 @@ respondentRouter.patch('/:sequenceId/:itemId');
 
 respondentRouter.delete('/:sequenceId');
 
+function adjustStepIndex (sequence: Sequence, step: Step, sequenceResponse: SequenceResponse): number {
+	const requestedIndex = sequence.steps.findIndex(s => s.id == step.id);
+	const prevStep = sequence.steps[requestedIndex - 1];
+	const nextStep = sequence.steps[requestedIndex + 1];
+
+	if (!sequenceResponse) {
+		return 0;
+	}
+
+	if (!nextStep) {
+		return null;
+	}
+
+	if (sequenceResponse.stepResponses.every(
+		(sr, sri) => Array.apply(null, {length: requestedIndex }).map(Function.call, Number)
+		.indexOf(sri) >= 0 && sequence.steps[sri].id == sr.step.id)
+	) {
+		return requestedIndex;
+	}
+
+	return sequenceResponse.stepResponses.length;
+}
+
+function adjustStepId (sequence: Sequence, step: Step, sequenceResponse: SequenceResponse): number {
+	return sequence.steps[adjustStepIndex(sequence, step, sequenceResponse)].id;
+}
+
 async function prepareStepForResponse ({...step}: Step, responseId: number | string) {
 	const response = await getConnection().getRepository(SequenceResponse).findOne(Number(responseId));
-
-	if (response.stepResponses.find(r => r.step.id === step.id)) {
-		throw Error(`Response ${responseId} already contains response for step ${step.id}`)
-	}
 
 	switch (step.type) {
 		case StepTypes.ITEM_REF: {

@@ -4,7 +4,7 @@
 // import { Sequence } from '../../models/sequence';
 import { respondentRouter } from './RespondentActions';
 import { interviewerRouter } from './InterviewerActions';
-import { identitiesRouter } from './IdentityRoutes';
+import { identitiesRouter } from './IdentityActions';
 import * as Router from 'koa-router';
 import { AssetContentTypes, AssetTypes } from '../../entity/Asset';
 import { ValidationTypes, TYPE_ValidationTypes, VALUE_ValidationTypes, META_VALUE_ValidationTypes } from '../../entity/FormatConstraint';
@@ -66,6 +66,8 @@ metaRouter.get('/types', async (ctx, next) => {
 
 	next();
 });
+
+
 
 
 function unpackEnum(en: {}) {
