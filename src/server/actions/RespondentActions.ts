@@ -123,7 +123,7 @@ async function prepareStepForResponse ({...step}: Step, responseId: number | str
 
 					if (asset.assetType === AssetTypes.DYNAMIC) {
 						const referencedResponse = response.stepResponses.find(sr => sr.step.item.id === Number(asset.content));
-						array.splice(currentIndex, 0, ...referencedResponse.response.body.map(body => {
+						array.splice(currentIndex, 1, ...referencedResponse.response.body.map(body => {
 							return new Asset({
 								assetType: AssetTypes.STATIC,
 								content: body.response,
