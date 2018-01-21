@@ -6,6 +6,8 @@ import { SequenceResponse } from '../../entity/SequenceResponse';
 import { Step, StepTypes } from '../../entity/Step';
 import { Asset, AssetContentTypes, AssetTypes } from '../../entity/Asset';
 import { ValidationTypes } from '../../entity/FormatConstraint';
+import * as koaBody from 'koa-body';
+import { StepResponse } from '../../entity/StepResponse';
 
 export const respondentRouter = new Router();
 
@@ -59,7 +61,26 @@ respondentRouter.get('getStep', '/:sequenceId/:stepId', async (ctx, next) => {
 });
 
 respondentRouter.post('/:sequenceId');
-respondentRouter.post('/:sequenceId/:itemId');
+respondentRouter.post('saveResponse', '/:sequenceId/:stepId', koaBody(), async (ctx, next) => {
+	const Responses = await getConnection().getRepository(SequenceResponse);
+	const response = await Responses.findOne(ctx.session.responseId);
+
+
+	// console.log(response);
+
+	response.stepResponses.push(new StepResponse(<StepResponse>{
+		step: {
+			id: ctx.params.stepId
+		},
+		response: {
+			body: ctx.request.body
+		}
+	}));
+
+	await Responses.save(response);
+
+	ctx.body = response;
+});
 
 respondentRouter.patch('/:sequenceId/:itemId');
 
@@ -74,9 +95,9 @@ function adjustStepIndex (sequence: Sequence, step: Step, sequenceResponse: Sequ
 		return 0;
 	}
 
-	if (!nextStep) {
-		return null;
-	}
+	// if (!nextStep) {
+	// 	return null;
+	// }
 
 	if (sequenceResponse.stepResponses.every(
 		(sr, sri) => Array.apply(null, {length: requestedIndex }).map(Function.call, Number)

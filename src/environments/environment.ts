@@ -6,6 +6,5 @@
 export const environment = {
   production: false,
   secret: ['0i9un89yb78675c6'],
-  ports: [4200, 3000, 3042],
   webPort: 8080
 };
