@@ -7,6 +7,8 @@ import { StepResponse } from '../../entity/StepResponse';
 import { Step } from '../../entity/Step';
 import { QuantityOrder } from '../../entity/enums/item.enums';
 import { StepTypes } from '../../entity/enums/step.enums';
+import { Asset } from '../../entity/Asset';
+import { AssetContentTypes, AssetTypes } from '../../entity/enums/asset.enums';
 
 
 export const respondentRouter = new Router();
@@ -110,7 +112,8 @@ function adjustStepIndex(sequence: Sequence, step: Step, sequenceResponse: Seque
 }
 
 function adjustStepId(sequence: Sequence, step: Step, sequenceResponse: SequenceResponse): number {
-    return sequence.steps[adjustStepIndex(sequence, step, sequenceResponse)].id;
+    const adjustedStep = sequence.steps[adjustStepIndex(sequence, step, sequenceResponse)];
+    return adjustedStep ? adjustedStep.id : null;
 }
 
 async function prepareStepForResponse({...step}: Step, responseId: number | string) {
@@ -119,24 +122,24 @@ async function prepareStepForResponse({...step}: Step, responseId: number | stri
     switch (step.type) {
         case StepTypes.ITEM_REF: {
             if (step.item.offers !== QuantityOrder.NONE) {
-                // step.item.assets = step.item.assets.reduce((whole, asset, currentIndex, array) => {
-                //
-                //     if (asset.assetType === AssetTypes.DYNAMIC) {
-                //         const referencedResponse = response.stepResponses.find(sr => sr.step.item.id === Number(asset.content));
-                //
-                //         array.splice(currentIndex, 0, ...referencedResponse.response.body.map(body => {
-                //             return new Asset({
-                //                 assetType: AssetTypes.STATIC,
-                //                 content: body.response,
-                //                 contentType: AssetContentTypes.TEXT,
-                //                 isGenerated: true,
-                //                 source: `${asset.id}:${referencedResponse.id}${body.source ? '|' + body.source : '+'}`,
-                //             });
-                //         }));
-                //     }
-                //
-                //     return array;
-                // }, step.item.assets);
+                step.item.assets = step.item.assets.reduce((whole, asset, currentIndex, array) => {
+
+                    if (asset.assetType === AssetTypes.DYNAMIC) {
+                        const referencedResponse = response.stepResponses.find(sr => sr.step.item.id === Number(asset.content));
+
+                        array.splice(currentIndex, 0, ...referencedResponse.response.body.map(body => {
+                            return new Asset({
+                                assetType: AssetTypes.STATIC,
+                                content: body.response,
+                                contentType: AssetContentTypes.TEXT,
+                                isGenerated: true,
+                                source: `${asset.id}:${referencedResponse.id}${body.source ? '|' + body.source : '+'}`,
+                            });
+                        }));
+                    }
+
+                    return array;
+                }, step.item.assets);
             }
             break;
         }
