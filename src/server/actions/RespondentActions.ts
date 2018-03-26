@@ -1,13 +1,13 @@
 import * as Router from 'koa-router';
 import { getConnection } from 'typeorm';
-import { Sequence } from '../../entity/Sequence';
-import { SequenceResponse } from '../../entity/SequenceResponse';
+import { Sequence } from '../../entity/sequence';
+import { SequenceResponse } from '../../entity/sequenceResponse';
 import * as koaBody from 'koa-body';
-import { StepResponse } from '../../entity/StepResponse';
-import { Step } from '../../entity/Step';
+import { StepResponse } from '../../entity/stepResponse';
+import { Step } from '../../entity/step';
 import { QuantityOrder } from '../../entity/enums/item.enums';
 import { StepTypes } from '../../entity/enums/step.enums';
-import { Asset } from '../../entity/Asset';
+import { Asset } from '../../entity/asset';
 import { AssetContentTypes, AssetTypes } from '../../entity/enums/asset.enums';
 
 

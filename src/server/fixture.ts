@@ -1,8 +1,8 @@
 import { getConnection, getRepository } from 'typeorm';
-import { Sequence } from '../entity/Sequence';
-import { Step } from '../entity/Step';
-import { SequenceResponse } from '../entity/SequenceResponse';
-import { Respondent } from '../entity/Respondent';
+import { Sequence } from '../entity/sequence';
+import { Step } from '../entity/step';
+import { SequenceResponse } from '../entity/sequenceResponse';
+import { Respondent } from '../entity/respondent';
 import { StepTypes } from '../entity/enums/step.enums';
 import { AssetContentTypes, AssetTypes } from '../entity/enums/asset.enums';
 import { ItemLifeCycleTypes, QuantityOrder } from '../entity/enums/item.enums';

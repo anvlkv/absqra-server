@@ -1,13 +1,13 @@
 import * as Router from 'koa-router';
 import * as koaBody from 'koa-body';
-import { Step } from '../../entity/Step';
-import { Asset } from '../../entity/Asset';
-import { FormatConstraint } from '../../entity/FormatConstraint';
+import { Step } from '../../entity/step';
+import { Asset } from '../../entity/asset';
+import { FormatConstraint } from '../../entity/formatConstraint';
 import { getConnection } from 'typeorm';
-import { Sequence } from '../../entity/Sequence';
-import { Item } from '../../entity/Item';
-import { SequenceHeader } from '../../entity/SequenceHeader';
-import { QuestionAsset } from '../../entity/QuestionAsset';
+import { Sequence } from '../../entity/sequence';
+import { Item } from '../../entity/item';
+import { SequenceHeader } from '../../entity/sequenceHeader';
+import { QuestionAsset } from '../../entity/questionAsset';
 import { StepTypes } from '../../entity/enums/step.enums';
 
 

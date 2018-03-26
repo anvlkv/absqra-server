@@ -1,8 +1,8 @@
 import { Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 import { Base } from './base';
-import { Sequence } from './Sequence';
-import { StepResponse } from './StepResponse';
-import { Respondent } from './Respondent';
+import { Sequence } from './sequence';
+import { StepResponse } from './stepResponse';
+import { Respondent } from './respondent';
 
 
 @Entity()

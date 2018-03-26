@@ -1,8 +1,8 @@
 import { AfterLoad, Column, Entity, JoinColumn, JoinTable, OneToMany, OneToOne, } from 'typeorm';
-import { Asset } from './Asset';
-import { FormatConstraint } from './FormatConstraint';
+import { Asset } from './asset';
+import { FormatConstraint } from './formatConstraint';
 import { Base } from './base';
-import { QuestionAsset } from './QuestionAsset';
+import { QuestionAsset } from './questionAsset';
 import { ItemLifeCycleTypes, QuantityOrder } from './enums/item.enums';
 
 

@@ -35,12 +35,12 @@
       "koa-session": "^5.8.1",
       "koa-session-async": "0.0.2",
       "koa-static": "^4.0.2",
-      "mongodb": "^2.2.34",
-      "mongoose": "^4.13.11",
+      "mongodb": "^2.2.35",
+      "mongoose": "^4.13.12",
       "mysql": "^2.15.0",
-      "nodemon": "^1.15.1",
+      "nodemon": "^1.17.2",
       "pg": "^7.4.1",
-      "typeorm": "^0.2.0-alpha.21"
+      "typeorm": "^0.2.0-alpha.30"
    },
    "devDependencies": {
       "@koa/cors": "^2.2.1",
@@ -51,7 +51,7 @@
       "@types/koa-send": "^4.1.1",
       "@types/koa-session": "^3.0.6",
       "@types/koa-static": "^4.0.0",
-      "@types/node": "^8.9.4",
+      "@types/node": "^8.10.0",
       "debug": "^3.1.0",
       "jasmine-core": "~2.5.2",
       "jasmine-spec-reporter": "~3.2.0",
@@ -64,6 +64,6 @@
       "ts-node": "3.3.0",
       "tslint": "^5.9.1",
       "typescript": "^2.7.2",
-      "typescript-ioc": "^1.1.0"
+      "typescript-ioc": "^1.1.1"
    }
 }

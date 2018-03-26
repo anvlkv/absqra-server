@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { Item } from './Item';
-import { Sequence } from './Sequence';
+import { Item } from './item';
+import { Sequence } from './sequence';
 import { OrderableBase } from './base';
 import { LogicTypes, StepTypes } from './enums/step.enums';
 

@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { OrderableBase } from './base';
-import { Item } from './Item';
+import { Item } from './item';
 import { AssetContentTypes, AssetTypes } from './enums/asset.enums';
 
 

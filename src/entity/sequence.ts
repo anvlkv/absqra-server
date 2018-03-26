@@ -1,8 +1,8 @@
 import { AfterLoad, JoinColumn, JoinTable, OneToMany, OneToOne, } from 'typeorm';
 import { Entity } from 'typeorm/decorator/entity/Entity';
-import { Step } from './Step';
+import { Step } from './step';
 import { Base } from './base';
-import { SequenceHeader } from './SequenceHeader';
+import { SequenceHeader } from './sequenceHeader';
 
 
 @Entity({

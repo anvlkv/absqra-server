@@ -1,7 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
 import { Base } from './base';
-import { Step } from './Step';
-import { Response } from './Response';
+import { Step } from './step';
+import { Response } from './response';
 
 
 @Entity()
