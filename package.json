@@ -40,7 +40,7 @@
       "mysql": "^2.15.0",
       "nodemon": "^1.17.2",
       "pg": "^7.4.1",
-      "typeorm": "^0.2.0-alpha.30"
+      "typeorm": "^0.2.0-alpha.38"
    },
    "devDependencies": {
       "@koa/cors": "^2.2.1",

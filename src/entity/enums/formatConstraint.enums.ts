@@ -22,5 +22,6 @@ export enum VALUE_ValidationTypes {
 export enum META_VALUE_ValidationTypes {
     VALUES_COUNT = 'values_count',
     STRING_LENGTH = 'value_length',
-    EXISTS = 'exists'
+    EXISTS = 'exists',
+    UNIQUE = 'unique'
 }
