@@ -1,42 +1,34 @@
 import * as Koa from 'koa';
 import * as helmet from 'koa-helmet';
-import * as cors from '@koa/cors';
+import * as cors from 'koa2-cors';
+import * as convert from 'koa-convert';
 import { createConnection } from 'typeorm';
-
-import { interviewerRouter } from './actions/InterviewerActions';
-import { identitiesRouter } from './actions/IdentityActions';
-import { respondentRouter } from './actions/RespondentActions';
-import { metaRouter } from './actions/MetaActions';
 import { fixture } from './fixture';
 import { environment } from '../environments/environment';
 import session = require('koa-session-async');
 import serve = require('koa-static');
 import send = require('koa-send');
+import { createCRUDRouterForEntities } from './simpleCrud';
+import { Project, Question, Sequence, Step } from '../entity';
+import { exportRoutes } from './exportRoutes';
+import { RespondentsList } from '../entity/respondentsList';
+import { Response } from '../entity/response';
 
 
-const port = process.argv[2] ? Number(process.argv[2]) : 3000;
+const port = environment.apiPort;
 const portShifted = port + 42;
 
 
 console.time('App listening on port ' + port);
 console.time('MetaApp listening on port ' + portShifted);
-console.time(`Web server listening on port ${environment.webPort}`);
+console.time(`Web server listening on port ${environment.port}`);
 console.time('Connected to PostgresSQL instance');
 
 (async () => {
-    const connection = await createConnection().catch(e => console.log('TypeORM connection error: ', e));
+    const connection = await createConnection()
+        .catch(e => console.log('TypeORM connection error: ', e));
 
     console.timeEnd('Connected to PostgresSQL instance');
-
-    fixture()();
-    // const connectionOptions = connection['options'];
-    // const sessionStore = new PgStore(`
-    // 	postgres://${connectionOptions.username}
-    // 	:${connectionOptions.password}
-    // 	@${connectionOptions.host}
-    // 	:${connectionOptions.port}
-    // 	/${connectionOptions.database}
-    // `);
 
 
     const CONFIG = {
@@ -53,56 +45,35 @@ console.time('Connected to PostgresSQL instance');
          The expiration is reset to the original maxAge, resetting the expiration countdown. default is false **/
     };
     const app = new Koa();
-    const metaApp = new Koa();
     const webServerApp = new Koa();
 
     app.keys = environment.secret;
 
     app.use(session(CONFIG, app));
 
+    const crudRouter = createCRUDRouterForEntities({
+        Project,
+        Sequence,
+        Step,
+        Question,
+        Response,
+        RespondentsList
+    });
+
+    app.use(crudRouter.routes());
+    app.use(crudRouter.allowedMethods());
+    exportRoutes(crudRouter, 'CRUDRouter');
+
     app.use(xResponseTime());
-    metaApp.use(xResponseTime());
     webServerApp.use(xResponseTime());
 
     app.use(logger('app'));
-    metaApp.use(logger('meta'));
     webServerApp.use(logger('web'));
 
     app.use(helmet());
-    metaApp.use(helmet());
     webServerApp.use(helmet());
 
-
-    const myCorsOptions = {
-        credentials: true,
-        origin: adjustAllowedOrigin(),
-    };
-
-    // TODO: should know your domains here
-    app.use(cors(myCorsOptions));
-    metaApp.use(cors(myCorsOptions));
-    webServerApp.use(cors(myCorsOptions));
-
     app.use(trimmer());
-    metaApp.use(trimmer());
-
-
-    // routes
-    metaApp
-    .use(metaRouter.routes())
-    .use(metaRouter.allowedMethods());
-
-    app
-    .use(identitiesRouter.routes())
-    .use(identitiesRouter.allowedMethods());
-
-    app
-    .use(interviewerRouter.routes())
-    .use(interviewerRouter.allowedMethods());
-
-    app
-    .use(respondentRouter.routes())
-    .use(respondentRouter.allowedMethods());
 
     webServerApp.use(serve('src/client'));
 
@@ -113,16 +84,24 @@ console.time('Connected to PostgresSQL instance');
         next();
     });
 
+    const myCorsOptions = {
+        origin: adjustAllowedOrigin(environment.port),
+    };
+    app.use(convert(cors(myCorsOptions)));
+
+    const myCorsOptionsWeb = {
+        // credentials: true,
+        origin: adjustAllowedOrigin(environment.port),
+    };
+    webServerApp.use(convert(cors(myCorsOptionsWeb)));
+
+
     app.listen(port, () => {
         console.timeEnd('App listening on port ' + port);
     });
 
-    metaApp.listen(portShifted, () => {
-        console.timeEnd('MetaApp listening on port ' + portShifted);
-    });
-
-    webServerApp.listen(environment.webPort, () => {
-        console.timeEnd(`Web server listening on port ${environment.webPort}`);
+    webServerApp.listen(environment.port, () => {
+        console.timeEnd(`Web server listening on port ${environment.port}`);
     });
 })();
 
@@ -167,10 +146,12 @@ function trimmer() {
     };
 }
 
-function adjustAllowedOrigin(isMeta?: boolean) {
+function adjustAllowedOrigin(sourcePort) {
+    const client = `${environment.protocol ? environment.protocol + '://' : ''}${environment.host}:${sourcePort}`;
     return function (req) {
-        const [originProtocol, originHost, originPort] = req.headers['origin'].split(':');
+        // const [originProtocol, originHost, originPort] = req.headers['origin'].split(':');
 
-        return `${req.protocol}://${req.host.split(':')[0]}:${originPort ? originPort : ''}`;
+        // return `${req.protocol}://${req.host.split(':')[0]}:${originPort ? originPort : ''}`;
+        return client;
     };
 }

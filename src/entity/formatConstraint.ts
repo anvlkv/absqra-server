@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { Base } from './base';
-import { Item } from './item';
 import { META_VALUE_ValidationTypes, TYPE_ValidationTypes, ValidationTypes, VALUE_ValidationTypes } from './enums/formatConstraint.enums';
+import { Question } from './question';
 
 
 @Entity()
@@ -22,6 +22,6 @@ export class FormatConstraint extends Base {
     @Column({type: 'boolean', nullable: true})
     booleanConstraint?: boolean;
 
-    @ManyToOne(type => Item, item => item.formatConstraints)
-    item?: Item;
+    @ManyToOne(type => Question, question => question.formatConstraints)
+    question: Question;
 }

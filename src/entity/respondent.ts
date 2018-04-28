@@ -1,9 +1,11 @@
-import { Column, Entity } from 'typeorm';
+import { Entity, ManyToOne } from 'typeorm';
+import { RespondentsList } from './respondentsList';
 import { Base } from './base';
-
 
 @Entity()
 export class Respondent extends Base {
-    @Column({type: 'char', length: 256})
-    name?: string;
+
+    @ManyToOne(type => RespondentsList, respondentsList => respondentsList.respondents)
+    list: RespondentsList;
+
 }

@@ -1,24 +1,19 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Base } from './base';
 import { Step } from './step';
 import { Response } from './response';
-
+import { ResponseBody } from './responseBody';
 
 @Entity()
 export class StepResponse extends Base {
-    @ManyToOne(type => Step, {
-        eager: true,
-    })
+    @ManyToOne(type => Step)
     @JoinColumn()
     step: Step;
 
-    @OneToOne(type => Response, {
-        cascade: true,
-        eager: true,
-    })
-    @JoinColumn()
-    response?: Response;
+    @ManyToOne(type => Response, response => response.stepResponses)
+    response: Response;
 
-    @Column({type: 'boolean', nullable: true})
-    logicalCondition?: boolean;
+    @Column({type: 'json'})
+    body: ResponseBody;
+
 }

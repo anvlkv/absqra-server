@@ -4,8 +4,8 @@ import { Question } from './question';
 
 
 @Entity()
-export class QuestionAsset extends AssetBase {
-    @ManyToOne(type => Question, question => question.questionOptions)
+export class ResponseAsset extends AssetBase {
+    @ManyToOne(type => Question, question => question.responseOptions)
     @JoinColumn()
     question: Question;
 }

@@ -1,11 +1,9 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { OrderableBase } from './base';
-import { Item } from './item';
 import { AssetContentTypes, AssetTypes } from './enums/asset.enums';
 
 
-@Entity()
-export class Asset extends OrderableBase {
+export class AssetBase extends OrderableBase {
     @Column({type: 'char', length: 32, default: AssetTypes.STATIC})
     assetType?: AssetTypes;
 
@@ -15,10 +13,7 @@ export class Asset extends OrderableBase {
     @Column({type: 'char', length: 2000, nullable: true})
     content?: string;
 
-    @ManyToOne(type => Item, item => item.assets)
-    item?: Item;
-
     isGenerated?: boolean;
-    source?: string;
+    origin?: number;
 }
 

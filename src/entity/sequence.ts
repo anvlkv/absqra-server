@@ -1,4 +1,4 @@
-import { AfterLoad, JoinColumn, JoinTable, OneToMany, OneToOne, } from 'typeorm';
+import { AfterLoad, Column, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, } from 'typeorm';
 import { Entity } from 'typeorm/decorator/entity/Entity';
 import { Step } from './step';
 import { Base } from './base';
@@ -6,14 +6,15 @@ import { SequenceHeader } from './sequenceHeader';
 
 
 @Entity({
-    // orderBy: {
-    // 	updatedDate: 'DESC',
-    // }
+    orderBy: {
+        updatedDate: 'DESC',
+    }
 })
 export class Sequence extends Base {
+
     @OneToOne(type => SequenceHeader, {
         eager: true,
-        cascade: true,
+        cascade: true
     })
     @JoinColumn()
     header?: SequenceHeader;
@@ -24,6 +25,9 @@ export class Sequence extends Base {
     })
     @JoinTable()
     steps?: Step[];
+
+    @ManyToMany(type => Step, step => step.sequenceReference)
+    referencedBySteps?: Sequence[];
 
     @AfterLoad()
     sortSteps?() {

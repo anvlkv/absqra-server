@@ -1,9 +1,6 @@
 export enum StepTypes {
     ITEM_REF = 'item_reference',
-    LOGIC = 'logic'
-}
-
-export enum LogicTypes {
-    ONE = 'one',
-    TWO = 'two'
+    TASK_REF = 'task_reference',
+    LOGICAL_ITEM = 'logical_item',
+    SEQUENCE_REF = 'sequence_reference'
 }

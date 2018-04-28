@@ -1,29 +1,50 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
-import { Item } from './item';
+import { Column, Entity, JoinTable, ManyToOne } from 'typeorm';
 import { Sequence } from './sequence';
 import { OrderableBase } from './base';
-import { LogicTypes, StepTypes } from './enums/step.enums';
+import { StepTypes } from './enums/step.enums';
+import { QuestionAsset } from './questionAsset';
+import { Question } from './question';
+import { Task } from './task';
+import { Logic } from './logic';
+import { StepAsset } from './stepAsset';
 
 
 @Entity()
 export class Step extends OrderableBase {
 
     @Column({type: 'char', length: 32, default: StepTypes.ITEM_REF})
-    type?: StepTypes;
+    type: StepTypes;
 
-    @ManyToOne(type => Item, {
-        cascade: true,
-        eager: true,
+    @ManyToOne(type => Sequence, sequence => sequence.referencedBySteps, {
+        cascade: true
     })
-    @JoinColumn()
-    item?: Item;
+    @JoinTable()
+    sequenceReference?: Sequence;
 
-    @Column({type: 'char', length: 32, default: LogicTypes.ONE, nullable: true})
-    logic?: LogicTypes;
+    @ManyToOne(type => Question, {
+        cascade: true
+    })
+    @JoinTable()
+    questionReference?: Question;
 
-    @Column({type: 'boolean', default: true})
-    isItemOrigin?: boolean;
+    @ManyToOne(type => Task, {
+        cascade: true
+    })
+    @JoinTable()
+    taskReference?: Task;
+
+    @ManyToOne(type => Logic, {
+        cascade: true
+    })
+    @JoinTable()
+    logicReference?: Logic;
+
+    @ManyToOne(type => StepAsset, {
+        cascade: true
+    })
+    @JoinTable()
+    assetReference?: StepAsset;
 
     @ManyToOne(type => Sequence, sequence => sequence.steps)
-    sequence?: Sequence;
+    sequence: Sequence;
 }

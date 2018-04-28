@@ -1,19 +1,26 @@
-import { AfterLoad, BeforeInsert, Column, CreateDateColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+    AfterLoad, BeforeInsert, BeforeUpdate, Column, CreateDateColumn, EntitySchema, PrimaryGeneratedColumn,
+    UpdateDateColumn,
+} from 'typeorm';
 
 export abstract class Base {
     @PrimaryGeneratedColumn()
     id?: number;
 
-    // @CreateDateColumn({type: 'timestamp'})
-    // createdDate?: Date;
-    //
-    // @UpdateDateColumn({type: 'timestamp'})
-    // updatedDate?: Date;
+    @CreateDateColumn({type: 'timestamp without time zone'})
+    createdDate?: Date;
 
-    constructor(data?) {
+    @UpdateDateColumn({type: 'timestamp without time zone'})
+    updatedDate?: Date;
+
+    constructor(data?: any, skipKeys: string[] = []) {
+        skipKeys = ['id', 'createdDate', 'updatedDate', ...skipKeys];
+
         if (data) {
             for (const key in data) {
-                if (data.hasOwnProperty(key)) {
+                if (data.hasOwnProperty(key)
+                    && !this[key]
+                    && skipKeys.indexOf(key) === -1) {
                     this[key] = data[key];
                 }
             }
