@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany
 import { Base } from './base';
 import { Sequence } from './sequence';
 import { RespondentsList } from './respondentsList';
-import { Response } from './response';
+import { SequenceResponse } from './response';
 
 @Entity()
 export class Project extends Base {
@@ -17,7 +17,7 @@ export class Project extends Base {
         eager: true,
     })
     @JoinTable()
-    sequence: Sequence;
+    topSequence: Sequence;
 
     @ManyToMany(type => RespondentsList, {
         cascade: true,
@@ -26,11 +26,11 @@ export class Project extends Base {
     @JoinTable()
     respondentsLists: RespondentsList[];
 
-    @OneToMany(type => Response, (response: Response) => response.project, {
+    @OneToMany(type => SequenceResponse, (response: SequenceResponse) => response.project, {
         cascade: true,
         eager: true
     })
     @JoinTable()
-    responses: Response[];
+    responses: SequenceResponse[];
 
 }

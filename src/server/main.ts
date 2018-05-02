@@ -12,7 +12,7 @@ import { createCRUDRouterForEntities } from './simpleCrud';
 import { Project, Question, Sequence, Step } from '../entity';
 import { exportRoutes } from './exportRoutes';
 import { RespondentsList } from '../entity/respondentsList';
-import { Response } from '../entity/response';
+import { SequenceResponse } from '../entity/response';
 
 
 const port = environment.apiPort;
@@ -56,7 +56,7 @@ console.time('Connected to PostgresSQL instance');
         Sequence,
         Step,
         Question,
-        Response,
+        Response: SequenceResponse,
         RespondentsList
     });
 
@@ -85,12 +85,13 @@ console.time('Connected to PostgresSQL instance');
     });
 
     const myCorsOptions = {
+        credentials: true,
         origin: adjustAllowedOrigin(environment.port),
     };
     app.use(convert(cors(myCorsOptions)));
 
     const myCorsOptionsWeb = {
-        // credentials: true,
+        credentials: true,
         origin: adjustAllowedOrigin(environment.port),
     };
     webServerApp.use(convert(cors(myCorsOptionsWeb)));
@@ -110,7 +111,7 @@ function xResponseTime() {
         const start = Date.now();
         await next();
         const ms = Date.now() - start;
-        ctx.set('X-Response-Time', `${ms}ms`);
+        ctx.set('X-SequenceResponse-Time', `${ms}ms`);
     };
 }
 

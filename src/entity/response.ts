@@ -6,7 +6,7 @@ import { StepResponse } from './stepResponse';
 import { Respondent } from './respondent';
 
 @Entity()
-export class Response extends Base {
+export class SequenceResponse extends Base {
 
     @ManyToOne(type => Project, project => project.responses)
     project: Project;

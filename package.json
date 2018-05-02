@@ -8,7 +8,7 @@
       "test": "test",
       "start": "concurrently \"npm run generate-barrels\" \"ts-node src/server/main.ts\" \"tsc\" ",
       "build": "tsc --verbose",
-      "build:live": "nodemon --config nodemon.json",
+      "build:watch": "nodemon --config nodemon.json",
       "restart:db": "psql -f sqlScripts/restart.sql -v datname=\"interveydev\" -v username=\"interveyapi\" -v datnameQ=\"'interveyapi'\"",
       "generate-barrels": "barrelsby --delete -c barrelconfig.json"
    },
