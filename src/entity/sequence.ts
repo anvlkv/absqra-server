@@ -1,4 +1,4 @@
-import { AfterLoad, Column, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, } from 'typeorm';
+import { AfterLoad, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, RelationId, } from 'typeorm';
 import { Entity } from 'typeorm/decorator/entity/Entity';
 import { Step } from './step';
 import { Base } from './base';
@@ -14,25 +14,22 @@ export class Sequence extends Base {
 
     @OneToOne(type => SequenceHeader, {
         eager: true,
-        cascade: true
+        cascade: true,
+        nullable: false
     })
     @JoinColumn()
     header?: SequenceHeader;
 
+
     @OneToMany(type => Step, step => step.sequence, {
-        cascade: true,
-        eager: true,
+        cascade: true
     })
     @JoinTable()
     steps?: Step[];
 
+    @RelationId((sequence: Sequence) => sequence.steps)
+    stepIds?: number[];
+
     @ManyToMany(type => Step, step => step.sequenceReference)
     referencedBySteps?: Sequence[];
-
-    @AfterLoad()
-    sortSteps?() {
-        if (this.steps) {
-            this.steps.sort((s1, s2) => s1.order - s2.order);
-        }
-    }
 }

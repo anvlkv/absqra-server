@@ -1,27 +1,26 @@
 import * as Koa from 'koa';
 import * as helmet from 'koa-helmet';
 import * as cors from 'koa2-cors';
-import * as convert from 'koa-convert';
 import { createConnection } from 'typeorm';
-import { fixture } from './fixture';
 import { environment } from '../environments/environment';
 import session = require('koa-session-async');
-import serve = require('koa-static');
-import send = require('koa-send');
 import { createCRUDRouterForEntities } from './simpleCrud';
 import { Project, Question, Sequence, Step } from '../entity';
-import { exportRoutes } from './exportRoutes';
+import { exportRoutes } from '../util/exportRoutes';
 import { RespondentsList } from '../entity/respondentsList';
 import { SequenceResponse } from '../entity/response';
+import { logger, trimmer, xResponseTime } from '../util/helpers';
+import { startWebServer } from './webServer';
 
 
 const port = environment.apiPort;
-const portShifted = port + 42;
 
+export const myCorsOptions: cors.Options = {
+    credentials: true,
+    origin: `${environment.protocol ? environment.protocol + '://' : ''}${environment.host}:${environment.clientPort || environment.port}`
+};
 
 console.time('App listening on port ' + port);
-console.time('MetaApp listening on port ' + portShifted);
-console.time(`Web server listening on port ${environment.port}`);
 console.time('Connected to PostgresSQL instance');
 
 (async () => {
@@ -45,12 +44,9 @@ console.time('Connected to PostgresSQL instance');
          The expiration is reset to the original maxAge, resetting the expiration countdown. default is false **/
     };
     const app = new Koa();
-    const webServerApp = new Koa();
 
-    app.keys = environment.secret;
 
-    app.use(session(CONFIG, app));
-
+    // TODO: learn to do it as part of build.
     const crudRouter = createCRUDRouterForEntities({
         Project,
         Sequence,
@@ -58,101 +54,45 @@ console.time('Connected to PostgresSQL instance');
         Question,
         Response: SequenceResponse,
         RespondentsList
-    });
+    }, 'crud', true);
+    // /TODO
 
-    app.use(crudRouter.routes());
-    app.use(crudRouter.allowedMethods());
-    exportRoutes(crudRouter, 'CRUDRouter');
+    app.keys = environment.secret;
 
-    app.use(xResponseTime());
-    webServerApp.use(xResponseTime());
-
-    app.use(logger('app'));
-    webServerApp.use(logger('web'));
-
-    app.use(helmet());
-    webServerApp.use(helmet());
-
+    app.use(session(CONFIG, app));
     app.use(trimmer());
 
-    webServerApp.use(serve('src/client'));
 
-    webServerApp.use(async (ctx, next) => {
-        if (!ctx.body) {
-            await send(ctx, 'src/client/index.html');
-        }
-        next();
+    app.use(async (ctx, next) => {
+       await next();
+
+       if (ctx.status == 204 && ctx.method == 'GET') {
+           ctx.throw(404, 'Not found');
+       }
     });
 
-    const myCorsOptions = {
-        credentials: true,
-        origin: adjustAllowedOrigin(environment.port),
-    };
-    app.use(convert(cors(myCorsOptions)));
+    app.use(xResponseTime());
 
-    const myCorsOptionsWeb = {
-        credentials: true,
-        origin: adjustAllowedOrigin(environment.port),
-    };
-    webServerApp.use(convert(cors(myCorsOptionsWeb)));
+    app.use(logger('app'));
 
+    app.use(helmet());
+
+
+    app.use(cors(myCorsOptions));
+
+    app.use(crudRouter.routes())
+        .use(crudRouter.allowedMethods());
 
     app.listen(port, () => {
         console.timeEnd('App listening on port ' + port);
-    });
 
-    webServerApp.listen(environment.port, () => {
-        console.timeEnd(`Web server listening on port ${environment.port}`);
+        if (environment.port) {
+            startWebServer();
+        }
+        else {
+            console.warn(`Use client at ${environment.clientPort} or specify environment.port`);
+        }
     });
 })();
 
-function xResponseTime() {
-    return async (ctx, next) => {
-        const start = Date.now();
-        await next();
-        const ms = Date.now() - start;
-        ctx.set('X-SequenceResponse-Time', `${ms}ms`);
-    };
-}
-
-
-function logger(name) {
-    return async (ctx, next) => {
-        console.time(`${name} - ${ctx.method} ${ctx.url}`);
-        await next();
-        console.timeEnd(`${name} - ${ctx.method} ${ctx.url}`);
-    };
-}
-
-function trimObject(obj) {
-    if (!obj) {
-        return;
-    }
-
-    for (const k of Object.keys(obj)) {
-        if (typeof obj[k] === 'string') {
-            obj[k] = <String>(obj[k]).trim();
-        }
-        else if (typeof obj[k] === 'object') {
-            obj[k] = trimObject(obj[k]);
-        }
-    }
-    return obj;
-}
-
-function trimmer() {
-    return async (ctx, next) => {
-        await next();
-        ctx.body = trimObject(ctx.body);
-    };
-}
-
-function adjustAllowedOrigin(sourcePort) {
-    const client = `${environment.protocol ? environment.protocol + '://' : ''}${environment.host}:${sourcePort}`;
-    return function (req) {
-        // const [originProtocol, originHost, originPort] = req.headers['origin'].split(':');
-
-        // return `${req.protocol}://${req.host.split(':')[0]}:${originPort ? originPort : ''}`;
-        return client;
-    };
-}
+process.on('SIGINT', () => { console.log('doei doei!'); process.exit(); });

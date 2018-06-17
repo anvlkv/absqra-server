@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, JoinTable, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, JoinColumn, JoinTable, ManyToOne, OneToMany, RelationId } from 'typeorm';
 import { Project } from './project';
 import { Base } from './base';
 import { Sequence } from './sequence';
@@ -14,15 +14,20 @@ export class SequenceResponse extends Base {
     @ManyToOne(type => Sequence)
     @JoinColumn()
     sequence: Sequence;
+    @RelationId((sequenceResponse: SequenceResponse) => sequenceResponse.sequence)
+    sequenceId?: number;
 
     @ManyToOne(type => Respondent)
     @JoinColumn()
     respondent: Respondent;
+    @RelationId((sequenceResponse: SequenceResponse) => sequenceResponse.respondent)
+    respondentId?: number;
 
     @OneToMany(type => StepResponse, stepResponse => stepResponse.response, {
-        cascade: true,
-        eager: true
+        cascade: true
     })
     @JoinTable()
     stepResponses: StepResponse[];
+    @RelationId((sequenceResponse: SequenceResponse) => sequenceResponse.stepResponses)
+    stepResponsesIds?: number[];
 }

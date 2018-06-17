@@ -1,36 +1,49 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, RelationId } from 'typeorm';
 import { Base } from './base';
 import { Sequence } from './sequence';
 import { RespondentsList } from './respondentsList';
 import { SequenceResponse } from './response';
 
-@Entity()
+@Entity({
+    orderBy: {
+        updatedDate: 'DESC'
+    }
+})
 export class Project extends Base {
-    @Column({type: 'char', length: 256, nullable: true})
+    @Column({type: 'char', length: 256, default: 'new project'})
     name?: string;
 
     @Column({type: 'char', length: 2000, nullable: true})
     description?: string;
 
+
+
     @ManyToOne(type => Sequence, {
-        cascade: true,
-        eager: true,
+        cascade: true
     })
-    @JoinTable()
+    @JoinColumn()
     topSequence: Sequence;
+    @RelationId((project: Project) => project.topSequence)
+    topSequenceId?: number;
+
+
 
     @ManyToMany(type => RespondentsList, {
-        cascade: true,
-        eager: true
+        cascade: true
     })
     @JoinTable()
     respondentsLists: RespondentsList[];
+    @RelationId((project: Project) => project.respondentsLists)
+    respondentsListsIds?: number[];
+
+
 
     @OneToMany(type => SequenceResponse, (response: SequenceResponse) => response.project, {
-        cascade: true,
-        eager: true
+        cascade: true
     })
     @JoinTable()
     responses: SequenceResponse[];
+    @RelationId((project: Project) => project.responses)
+    responsesIds?: number[];
 
 }

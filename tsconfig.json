@@ -15,6 +15,7 @@
       "declarationDir": "lib/types"
    },
    "exclude": [
-      "lib"
+      "lib",
+      "node_modules"
    ]
 }

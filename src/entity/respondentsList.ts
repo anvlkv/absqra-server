@@ -1,4 +1,4 @@
-import { Entity, JoinTable, OneToMany } from 'typeorm';
+import { Entity, JoinTable, OneToMany, RelationId } from 'typeorm';
 import { Respondent } from './respondent';
 import { Base } from './base';
 
@@ -10,4 +10,6 @@ export class RespondentsList extends Base {
     })
     @JoinTable()
     respondents: Respondent[];
+    @RelationId((respondent: RespondentsList) => respondent.respondents)
+    respondentsIds?: number[];
 }

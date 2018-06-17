@@ -1,9 +1,19 @@
 import * as Router from 'koa-router';
 import * as koaBody from 'koa-body';
-import { getConnection } from 'typeorm';
+import { FindOneOptions, getConnection } from 'typeorm';
 import { Repository } from 'typeorm/repository/Repository';
 import { applyPatch, Operation, applyReducer, validate } from 'fast-json-patch';
 import * as pluralize from 'pluralize';
+import { environment } from '../environments/environment';
+import { FindManyOptions } from 'typeorm/find-options/FindManyOptions';
+import { exportRoutes } from '../util/exportRoutes';
+import { EntityMetadata } from 'typeorm/metadata/EntityMetadata';
+
+// TODO: export class CRUDRouterManager {
+//
+// }
+
+const routesPerEntry = 6;
 
 function capitalizeFirstLetter (string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
@@ -13,10 +23,52 @@ function lowerFistLetter (string) {
     return string.charAt(0).toLowerCase() + string.slice(1);
 }
 
+function handleError(e, ctx, next) {
+    if (!environment.production) {
+        ctx.body = e;
+    }
+    else {
+        ctx.body = 'ERR'
+    }
+    ctx.status = 500;
+    next();
+}
+
+function populateDefaults(meta: EntityMetadata, nonCyclicEntities: string[] = []): any {
+    const defaultEntity = {};
+    try {
+        if (meta.columns) {
+            meta.columns.forEach(column => {
+                defaultEntity[column.propertyName] = column.default || null;
+            });
+        }
+        if (meta.relations) {
+            meta.relations.forEach(relation => {
+                if (!nonCyclicEntities.find(n => n == (<any>relation).type.name)) {
+                    nonCyclicEntities.push((<any>relation).type.name);
+                    if (!relation.isNullable) {
+                        const defaultValue = populateDefaults(relation.inverseEntityMetadata, nonCyclicEntities);
+                        defaultEntity[relation.propertyName] = (relation.isOneToMany || relation.isManyToMany) ? [defaultValue] : defaultValue;
+                    }
+                    else {
+                        defaultEntity[relation.propertyName] = null;
+                    }
+                }
+            });
+        }
+    } catch (e) {
+        console.error('creating default entity failed', e);
+    }
+
+    return defaultEntity;
+}
+
 export function createCRUDRouterForEntities (entities: {[name: string]: any },
                                              crudPrefix = '',
+                                             exportGeneratedRoutes = false,
                                              router = new Router(),
-                                             routeNamePostfix?: string) {
+                                             routeNamePostfix = '',
+                                             parentName?: string) {
     const generateRouterNamePostfix = function (name) {
         let namePostfix = '';
         if (routeNamePostfix) {
@@ -27,6 +79,10 @@ export function createCRUDRouterForEntities (entities: {[name: string]: any },
         }
         return namePostfix;
     };
+
+    if (crudPrefix && crudPrefix[0] != '/') {
+        crudPrefix = `/${crudPrefix}`
+    }
 
     for (const entityName in entities) {
         let Repo: Repository<any>;
@@ -43,83 +99,117 @@ export function createCRUDRouterForEntities (entities: {[name: string]: any },
         const localPostfix = generateRouterNamePostfix(name);
         const pluralizedName = pluralize(name);
         const localPluralizedPostfix = generateRouterNamePostfix(pluralizedName);
+        const defaultEntity = populateDefaults(Repo.metadata);
+
 
         router.get(`getAll${localPluralizedPostfix}`, `${crudPrefix}/${pluralizedName}`, async (ctx, next) => {
-            ctx.body = await Repo.find();
-            next();
+            const findManyOptions: FindManyOptions<any> = {};
+
+            if (parentName) {
+                findManyOptions.where = `"${parentName}Id"=${ctx.params[`${parentName}Id`]}`;
+            }
+
+            try {
+                ctx.body = await Repo.find(findManyOptions);
+            } catch (e) {
+                handleError(e, ctx, next);
+            }
         });
 
         router.get(`get${localPostfix}`, `${crudPrefix}/${pluralizedName}/:${name}Id`, async (ctx, next) => {
-            ctx.body = await Repo.findOne(ctx.params[`${name}Id`]);
-            next();
+            try {
+                const itemId = Number(ctx.params[`${name}Id`]);
+                if (itemId === 0) {
+                    ctx.body = defaultEntity;
+                }
+                else {
+                    ctx.body = await Repo.findOne(itemId);
+                }
+            } catch (e) {
+                handleError(e, ctx, next);
+            }
         });
 
         router.post(`new${localPostfix}`, `${crudPrefix}/${pluralizedName}`, koaBody(), async (ctx, next) => {
-            const entry = new Entity(ctx.request.body);
-            await Repo.save(entry);
-            ctx.body = await Repo.findOne(entry.id);
-            next();
+            try {
+                const entry = new Entity(ctx.request.body);
+                await Repo.save(entry);
+                ctx.body = await Repo.findOne(entry.id);
+            } catch (e) {
+                handleError(e, ctx, next);
+            }
         });
 
         router.post(`save${localPostfix}`, `${crudPrefix}/${pluralizedName}/:${name}Id`, koaBody(), async (ctx, next) => {
-            let entry = await Repo.findOne(ctx.params[`${name}Id`]);
-            const requestBodyFields = Object.keys(ctx.request.body);
+            try {
+                const id = ctx.params[`${name}Id`];
+                const entry = await Repo.findOne(id);
+                const requestBodyFields = Object.keys(ctx.request.body);
 
-            for (const key in Object.keys(entry)) {
-                if (requestBodyFields.indexOf(key) === -1) {
-                    ctx.request.body[key] = null;
+                for (let key in requestBodyFields) {
+                    key = requestBodyFields[key];
+                    entry[key] = ctx.request.body[key];
                 }
+
+                await Repo.save(entry);
+
+                ctx.body = await Repo.findOne(id);
+            } catch (e) {
+                handleError(e, ctx, next);
             }
-
-            entry = {
-                ...entry,
-                ...ctx.request.body
-            };
-
-            ctx.body = await Repo.save(entry);
-            next();
         });
 
         router.patch(`update${localPostfix}`, `${crudPrefix}/${pluralizedName}/:${name}Id`, koaBody(), async (ctx, next) => {
-            const patchDocument: Operation[] = ctx.request.body;
-            const entry = await Repo.findOne(ctx.params[`${name}Id`]);
-            const patchErrors = validate(patchDocument, entry);
-            if (!patchErrors) {
-                let operationResult;
+            try {
+                const patchDocument: Operation[] = ctx.request.body;
+                const id: number = ctx.params[`${name}Id`];
+                const entry = await Repo.findOne();
+                const patchErrors = validate(patchDocument, entry);
+                if (!patchErrors) {
+                    let operationResult;
 
-                if (!!(Repo.metadata.oneToManyRelations.length || Repo.metadata.manyToManyRelations.length)) {
-                    operationResult = patchDocument.reduce(applyReducer, entry);
+                    if (!!(Repo.metadata.oneToManyRelations.length || Repo.metadata.manyToManyRelations.length)) {
+                        operationResult = patchDocument.reduce(applyReducer, entry);
+                    }
+                    else {
+                        operationResult = applyPatch(entry, patchDocument).newDocument;
+                    }
+
+                    await Repo.save(operationResult);
+
+                    ctx.body = await Repo.findOne(id);
                 }
                 else {
-                    operationResult = applyPatch(entry, patchDocument).newDocument;
+                    ctx.status = 400;
+                    ctx.body = patchErrors;
                 }
 
-                ctx.body = await Repo.save(operationResult);
+            } catch (e) {
+                handleError(e, ctx, next);
             }
-            else {
-                ctx.status = 400;
-                ctx.body = patchErrors;
-            }
-            next();
         });
 
         router.delete(`delete${localPostfix}`, `${crudPrefix}/${pluralizedName}/:${name}Id`, async (ctx, next) => {
             const deletedEntry = await Repo.findOne(ctx.params[`${name}Id`]);
             await Repo.delete(ctx.params[`${name}Id`]);
             ctx.body = deletedEntry;
-            next();
         });
 
         const relatedEntities = Repo.metadata.relations.reduce((related, meta) => {
             if (!meta.isOwning) {
-                related[(<() => any>meta.type).name] = meta.type;
+
+                related[(<() => any> meta.type).name] = meta.type;
             }
             return related
         }, {});
 
         if (Object.keys(relatedEntities).length) {
-            createCRUDRouterForEntities(relatedEntities, `${crudPrefix}/${pluralizedName}/:${name}Id`, router, localPostfix);
+            createCRUDRouterForEntities(relatedEntities, `${crudPrefix}/${pluralizedName}/:${name}Id`, false, router, localPostfix, name);
         }
+    }
+
+    if (exportGeneratedRoutes) {
+        exportRoutes(router, 'CRUDRouter');
     }
 
     return router;
