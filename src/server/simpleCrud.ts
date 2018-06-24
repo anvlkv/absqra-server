@@ -34,7 +34,7 @@ function handleError(e, ctx, next) {
     next();
 }
 
-function populateDefaults(meta: EntityMetadata, nonCyclicEntities: string[] = []): any {
+function populateDefaults(meta: EntityMetadata, cyclicEntities: string[] = []): any {
     const defaultEntity = {};
     try {
         if (meta.columns) {
@@ -44,10 +44,10 @@ function populateDefaults(meta: EntityMetadata, nonCyclicEntities: string[] = []
         }
         if (meta.relations) {
             meta.relations.forEach(relation => {
-                if (!nonCyclicEntities.find(n => n == (<any>relation).type.name)) {
-                    nonCyclicEntities.push((<any>relation).type.name);
+                if (!cyclicEntities.find(n => n == (<any>relation).type.name)) {
+                    cyclicEntities.push((<any>relation).type.name);
                     if (!relation.isNullable) {
-                        const defaultValue = populateDefaults(relation.inverseEntityMetadata, nonCyclicEntities);
+                        const defaultValue = populateDefaults(relation.inverseEntityMetadata, cyclicEntities);
                         defaultEntity[relation.propertyName] = (relation.isOneToMany || relation.isManyToMany) ? [defaultValue] : defaultValue;
                     }
                     else {
@@ -163,7 +163,7 @@ export function createCRUDRouterForEntities (entities: {[name: string]: any },
             try {
                 const patchDocument: Operation[] = ctx.request.body;
                 const id: number = ctx.params[`${name}Id`];
-                const entry = await Repo.findOne();
+                const entry = await Repo.findOne(id);
                 const patchErrors = validate(patchDocument, entry);
                 if (!patchErrors) {
                     let operationResult;

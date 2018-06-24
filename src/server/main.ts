@@ -60,7 +60,7 @@ console.time('Connected to PostgresSQL instance');
     app.keys = environment.secret;
 
     app.use(session(CONFIG, app));
-    app.use(trimmer());
+    // app.use(trimmer());
 
 
     app.use(async (ctx, next) => {
