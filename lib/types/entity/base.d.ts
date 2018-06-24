@@ -3,8 +3,4 @@ export declare abstract class Base {
     createdDate?: Date;
     updatedDate?: Date;
     constructor(data?: any, skipKeys?: string[]);
-    trimStrings?(): void;
-}
-export declare abstract class OrderableBase extends Base {
-    order?: number;
 }

@@ -1,338 +1,338 @@
 export const CRUDRouter = {
     getAllProjects: {
-        path: '/projects',
+        path: '/crud/projects',
         params: [],
     },
     getProject: {
-        path: '/projects/:projectId',
+        path: '/crud/projects/:projectId',
         params: ['projectId'],
     },
     newProject: {
-        path: '/projects',
+        path: '/crud/projects',
         params: [],
     },
     saveProject: {
-        path: '/projects/:projectId',
+        path: '/crud/projects/:projectId',
         params: ['projectId'],
     },
     updateProject: {
-        path: '/projects/:projectId',
+        path: '/crud/projects/:projectId',
         params: ['projectId'],
     },
     deleteProject: {
-        path: '/projects/:projectId',
+        path: '/crud/projects/:projectId',
         params: ['projectId'],
     },
-    getAllResponsesOfProject: {
-        path: '/projects/:projectId/responses',
+    getAllSequenceResponsesOfProject: {
+        path: '/crud/projects/:projectId/sequenceResponses',
         params: ['projectId'],
     },
-    getResponseOfProject: {
-        path: '/projects/:projectId/responses/:responseId',
-        params: ['projectId', 'responseId'],
+    getSequenceResponseOfProject: {
+        path: '/crud/projects/:projectId/sequenceResponses/:sequenceResponseId',
+        params: ['projectId', 'sequenceResponseId'],
     },
-    newResponseOfProject: {
-        path: '/projects/:projectId/responses',
+    newSequenceResponseOfProject: {
+        path: '/crud/projects/:projectId/sequenceResponses',
         params: ['projectId'],
     },
-    saveResponseOfProject: {
-        path: '/projects/:projectId/responses/:responseId',
-        params: ['projectId', 'responseId'],
+    saveSequenceResponseOfProject: {
+        path: '/crud/projects/:projectId/sequenceResponses/:sequenceResponseId',
+        params: ['projectId', 'sequenceResponseId'],
     },
-    updateResponseOfProject: {
-        path: '/projects/:projectId/responses/:responseId',
-        params: ['projectId', 'responseId'],
+    updateSequenceResponseOfProject: {
+        path: '/crud/projects/:projectId/sequenceResponses/:sequenceResponseId',
+        params: ['projectId', 'sequenceResponseId'],
     },
-    deleteResponseOfProject: {
-        path: '/projects/:projectId/responses/:responseId',
-        params: ['projectId', 'responseId'],
+    deleteSequenceResponseOfProject: {
+        path: '/crud/projects/:projectId/sequenceResponses/:sequenceResponseId',
+        params: ['projectId', 'sequenceResponseId'],
     },
-    getAllStepResponsesOfResponseOfProject: {
-        path: '/projects/:projectId/responses/:responseId/stepResponses',
-        params: ['projectId', 'responseId'],
+    getAllStepResponsesOfSequenceResponseOfProject: {
+        path: '/crud/projects/:projectId/sequenceResponses/:sequenceResponseId/stepResponses',
+        params: ['projectId', 'sequenceResponseId'],
     },
-    getStepResponseOfResponseOfProject: {
-        path: '/projects/:projectId/responses/:responseId/stepResponses/:stepResponseId',
-        params: ['projectId', 'responseId', 'stepResponseId'],
+    getStepResponseOfSequenceResponseOfProject: {
+        path: '/crud/projects/:projectId/sequenceResponses/:sequenceResponseId/stepResponses/:stepResponseId',
+        params: ['projectId', 'sequenceResponseId', 'stepResponseId'],
     },
-    newStepResponseOfResponseOfProject: {
-        path: '/projects/:projectId/responses/:responseId/stepResponses',
-        params: ['projectId', 'responseId'],
+    newStepResponseOfSequenceResponseOfProject: {
+        path: '/crud/projects/:projectId/sequenceResponses/:sequenceResponseId/stepResponses',
+        params: ['projectId', 'sequenceResponseId'],
     },
-    saveStepResponseOfResponseOfProject: {
-        path: '/projects/:projectId/responses/:responseId/stepResponses/:stepResponseId',
-        params: ['projectId', 'responseId', 'stepResponseId'],
+    saveStepResponseOfSequenceResponseOfProject: {
+        path: '/crud/projects/:projectId/sequenceResponses/:sequenceResponseId/stepResponses/:stepResponseId',
+        params: ['projectId', 'sequenceResponseId', 'stepResponseId'],
     },
-    updateStepResponseOfResponseOfProject: {
-        path: '/projects/:projectId/responses/:responseId/stepResponses/:stepResponseId',
-        params: ['projectId', 'responseId', 'stepResponseId'],
+    updateStepResponseOfSequenceResponseOfProject: {
+        path: '/crud/projects/:projectId/sequenceResponses/:sequenceResponseId/stepResponses/:stepResponseId',
+        params: ['projectId', 'sequenceResponseId', 'stepResponseId'],
     },
-    deleteStepResponseOfResponseOfProject: {
-        path: '/projects/:projectId/responses/:responseId/stepResponses/:stepResponseId',
-        params: ['projectId', 'responseId', 'stepResponseId'],
+    deleteStepResponseOfSequenceResponseOfProject: {
+        path: '/crud/projects/:projectId/sequenceResponses/:sequenceResponseId/stepResponses/:stepResponseId',
+        params: ['projectId', 'sequenceResponseId', 'stepResponseId'],
     },
     getAllSequences: {
-        path: '/sequences',
+        path: '/crud/sequences',
         params: [],
     },
     getSequence: {
-        path: '/sequences/:sequenceId',
+        path: '/crud/sequences/:sequenceId',
         params: ['sequenceId'],
     },
     newSequence: {
-        path: '/sequences',
+        path: '/crud/sequences',
         params: [],
     },
     saveSequence: {
-        path: '/sequences/:sequenceId',
+        path: '/crud/sequences/:sequenceId',
         params: ['sequenceId'],
     },
     updateSequence: {
-        path: '/sequences/:sequenceId',
+        path: '/crud/sequences/:sequenceId',
         params: ['sequenceId'],
     },
     deleteSequence: {
-        path: '/sequences/:sequenceId',
+        path: '/crud/sequences/:sequenceId',
         params: ['sequenceId'],
     },
     getAllStepsOfSequence: {
-        path: '/sequences/:sequenceId/steps',
+        path: '/crud/sequences/:sequenceId/steps',
         params: ['sequenceId'],
     },
     getStepOfSequence: {
-        path: '/sequences/:sequenceId/steps/:stepId',
+        path: '/crud/sequences/:sequenceId/steps/:stepId',
         params: ['sequenceId', 'stepId'],
     },
     newStepOfSequence: {
-        path: '/sequences/:sequenceId/steps',
+        path: '/crud/sequences/:sequenceId/steps',
         params: ['sequenceId'],
     },
     saveStepOfSequence: {
-        path: '/sequences/:sequenceId/steps/:stepId',
+        path: '/crud/sequences/:sequenceId/steps/:stepId',
         params: ['sequenceId', 'stepId'],
     },
     updateStepOfSequence: {
-        path: '/sequences/:sequenceId/steps/:stepId',
+        path: '/crud/sequences/:sequenceId/steps/:stepId',
         params: ['sequenceId', 'stepId'],
     },
     deleteStepOfSequence: {
-        path: '/sequences/:sequenceId/steps/:stepId',
+        path: '/crud/sequences/:sequenceId/steps/:stepId',
         params: ['sequenceId', 'stepId'],
     },
     getAllSteps: {
-        path: '/steps',
+        path: '/crud/steps',
         params: [],
     },
     getStep: {
-        path: '/steps/:stepId',
+        path: '/crud/steps/:stepId',
         params: ['stepId'],
     },
     newStep: {
-        path: '/steps',
+        path: '/crud/steps',
         params: [],
     },
     saveStep: {
-        path: '/steps/:stepId',
+        path: '/crud/steps/:stepId',
         params: ['stepId'],
     },
     updateStep: {
-        path: '/steps/:stepId',
+        path: '/crud/steps/:stepId',
         params: ['stepId'],
     },
     deleteStep: {
-        path: '/steps/:stepId',
+        path: '/crud/steps/:stepId',
         params: ['stepId'],
     },
     getAllQuestions: {
-        path: '/questions',
+        path: '/crud/questions',
         params: [],
     },
     getQuestion: {
-        path: '/questions/:questionId',
+        path: '/crud/questions/:questionId',
         params: ['questionId'],
     },
     newQuestion: {
-        path: '/questions',
+        path: '/crud/questions',
         params: [],
     },
     saveQuestion: {
-        path: '/questions/:questionId',
+        path: '/crud/questions/:questionId',
         params: ['questionId'],
     },
     updateQuestion: {
-        path: '/questions/:questionId',
+        path: '/crud/questions/:questionId',
         params: ['questionId'],
     },
     deleteQuestion: {
-        path: '/questions/:questionId',
+        path: '/crud/questions/:questionId',
         params: ['questionId'],
     },
     getAllFormatConstraintsOfQuestion: {
-        path: '/questions/:questionId/formatConstraints',
+        path: '/crud/questions/:questionId/formatConstraints',
         params: ['questionId'],
     },
     getFormatConstraintOfQuestion: {
-        path: '/questions/:questionId/formatConstraints/:formatConstraintId',
+        path: '/crud/questions/:questionId/formatConstraints/:formatConstraintId',
         params: ['questionId', 'formatConstraintId'],
     },
     newFormatConstraintOfQuestion: {
-        path: '/questions/:questionId/formatConstraints',
+        path: '/crud/questions/:questionId/formatConstraints',
         params: ['questionId'],
     },
     saveFormatConstraintOfQuestion: {
-        path: '/questions/:questionId/formatConstraints/:formatConstraintId',
+        path: '/crud/questions/:questionId/formatConstraints/:formatConstraintId',
         params: ['questionId', 'formatConstraintId'],
     },
     updateFormatConstraintOfQuestion: {
-        path: '/questions/:questionId/formatConstraints/:formatConstraintId',
+        path: '/crud/questions/:questionId/formatConstraints/:formatConstraintId',
         params: ['questionId', 'formatConstraintId'],
     },
     deleteFormatConstraintOfQuestion: {
-        path: '/questions/:questionId/formatConstraints/:formatConstraintId',
+        path: '/crud/questions/:questionId/formatConstraints/:formatConstraintId',
         params: ['questionId', 'formatConstraintId'],
     },
     getAllQuestionAssetsOfQuestion: {
-        path: '/questions/:questionId/questionAssets',
+        path: '/crud/questions/:questionId/questionAssets',
         params: ['questionId'],
     },
     getQuestionAssetOfQuestion: {
-        path: '/questions/:questionId/questionAssets/:questionAssetId',
+        path: '/crud/questions/:questionId/questionAssets/:questionAssetId',
         params: ['questionId', 'questionAssetId'],
     },
     newQuestionAssetOfQuestion: {
-        path: '/questions/:questionId/questionAssets',
+        path: '/crud/questions/:questionId/questionAssets',
         params: ['questionId'],
     },
     saveQuestionAssetOfQuestion: {
-        path: '/questions/:questionId/questionAssets/:questionAssetId',
+        path: '/crud/questions/:questionId/questionAssets/:questionAssetId',
         params: ['questionId', 'questionAssetId'],
     },
     updateQuestionAssetOfQuestion: {
-        path: '/questions/:questionId/questionAssets/:questionAssetId',
+        path: '/crud/questions/:questionId/questionAssets/:questionAssetId',
         params: ['questionId', 'questionAssetId'],
     },
     deleteQuestionAssetOfQuestion: {
-        path: '/questions/:questionId/questionAssets/:questionAssetId',
+        path: '/crud/questions/:questionId/questionAssets/:questionAssetId',
         params: ['questionId', 'questionAssetId'],
     },
     getAllResponseAssetsOfQuestion: {
-        path: '/questions/:questionId/responseAssets',
+        path: '/crud/questions/:questionId/responseAssets',
         params: ['questionId'],
     },
     getResponseAssetOfQuestion: {
-        path: '/questions/:questionId/responseAssets/:responseAssetId',
+        path: '/crud/questions/:questionId/responseAssets/:responseAssetId',
         params: ['questionId', 'responseAssetId'],
     },
     newResponseAssetOfQuestion: {
-        path: '/questions/:questionId/responseAssets',
+        path: '/crud/questions/:questionId/responseAssets',
         params: ['questionId'],
     },
     saveResponseAssetOfQuestion: {
-        path: '/questions/:questionId/responseAssets/:responseAssetId',
+        path: '/crud/questions/:questionId/responseAssets/:responseAssetId',
         params: ['questionId', 'responseAssetId'],
     },
     updateResponseAssetOfQuestion: {
-        path: '/questions/:questionId/responseAssets/:responseAssetId',
+        path: '/crud/questions/:questionId/responseAssets/:responseAssetId',
         params: ['questionId', 'responseAssetId'],
     },
     deleteResponseAssetOfQuestion: {
-        path: '/questions/:questionId/responseAssets/:responseAssetId',
+        path: '/crud/questions/:questionId/responseAssets/:responseAssetId',
         params: ['questionId', 'responseAssetId'],
     },
     getAllResponses: {
-        path: '/responses',
+        path: '/crud/responses',
         params: [],
     },
     getResponse: {
-        path: '/responses/:responseId',
+        path: '/crud/responses/:responseId',
         params: ['responseId'],
     },
     newResponse: {
-        path: '/responses',
+        path: '/crud/responses',
         params: [],
     },
     saveResponse: {
-        path: '/responses/:responseId',
+        path: '/crud/responses/:responseId',
         params: ['responseId'],
     },
     updateResponse: {
-        path: '/responses/:responseId',
+        path: '/crud/responses/:responseId',
         params: ['responseId'],
     },
     deleteResponse: {
-        path: '/responses/:responseId',
+        path: '/crud/responses/:responseId',
         params: ['responseId'],
     },
     getAllStepResponsesOfResponse: {
-        path: '/responses/:responseId/stepResponses',
+        path: '/crud/responses/:responseId/stepResponses',
         params: ['responseId'],
     },
     getStepResponseOfResponse: {
-        path: '/responses/:responseId/stepResponses/:stepResponseId',
+        path: '/crud/responses/:responseId/stepResponses/:stepResponseId',
         params: ['responseId', 'stepResponseId'],
     },
     newStepResponseOfResponse: {
-        path: '/responses/:responseId/stepResponses',
+        path: '/crud/responses/:responseId/stepResponses',
         params: ['responseId'],
     },
     saveStepResponseOfResponse: {
-        path: '/responses/:responseId/stepResponses/:stepResponseId',
+        path: '/crud/responses/:responseId/stepResponses/:stepResponseId',
         params: ['responseId', 'stepResponseId'],
     },
     updateStepResponseOfResponse: {
-        path: '/responses/:responseId/stepResponses/:stepResponseId',
+        path: '/crud/responses/:responseId/stepResponses/:stepResponseId',
         params: ['responseId', 'stepResponseId'],
     },
     deleteStepResponseOfResponse: {
-        path: '/responses/:responseId/stepResponses/:stepResponseId',
+        path: '/crud/responses/:responseId/stepResponses/:stepResponseId',
         params: ['responseId', 'stepResponseId'],
     },
     getAllRespondentsLists: {
-        path: '/respondentsLists',
+        path: '/crud/respondentsLists',
         params: [],
     },
     getRespondentsList: {
-        path: '/respondentsLists/:respondentsListId',
+        path: '/crud/respondentsLists/:respondentsListId',
         params: ['respondentsListId'],
     },
     newRespondentsList: {
-        path: '/respondentsLists',
+        path: '/crud/respondentsLists',
         params: [],
     },
     saveRespondentsList: {
-        path: '/respondentsLists/:respondentsListId',
+        path: '/crud/respondentsLists/:respondentsListId',
         params: ['respondentsListId'],
     },
     updateRespondentsList: {
-        path: '/respondentsLists/:respondentsListId',
+        path: '/crud/respondentsLists/:respondentsListId',
         params: ['respondentsListId'],
     },
     deleteRespondentsList: {
-        path: '/respondentsLists/:respondentsListId',
+        path: '/crud/respondentsLists/:respondentsListId',
         params: ['respondentsListId'],
     },
     getAllRespondentsOfRespondentsList: {
-        path: '/respondentsLists/:respondentsListId/respondents',
+        path: '/crud/respondentsLists/:respondentsListId/respondents',
         params: ['respondentsListId'],
     },
     getRespondentOfRespondentsList: {
-        path: '/respondentsLists/:respondentsListId/respondents/:respondentId',
+        path: '/crud/respondentsLists/:respondentsListId/respondents/:respondentId',
         params: ['respondentsListId', 'respondentId'],
     },
     newRespondentOfRespondentsList: {
-        path: '/respondentsLists/:respondentsListId/respondents',
+        path: '/crud/respondentsLists/:respondentsListId/respondents',
         params: ['respondentsListId'],
     },
     saveRespondentOfRespondentsList: {
-        path: '/respondentsLists/:respondentsListId/respondents/:respondentId',
+        path: '/crud/respondentsLists/:respondentsListId/respondents/:respondentId',
         params: ['respondentsListId', 'respondentId'],
     },
     updateRespondentOfRespondentsList: {
-        path: '/respondentsLists/:respondentsListId/respondents/:respondentId',
+        path: '/crud/respondentsLists/:respondentsListId/respondents/:respondentId',
         params: ['respondentsListId', 'respondentId'],
     },
     deleteRespondentOfRespondentsList: {
-        path: '/respondentsLists/:respondentsListId/respondents/:respondentId',
+        path: '/crud/respondentsLists/:respondentsListId/respondents/:respondentId',
         params: ['respondentsListId', 'respondentId'],
     }
 };

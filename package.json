@@ -1,7 +1,7 @@
 {
-   "name": "intervey-api",
+   "name": "absqra-api",
    "version": "1.0.0",
-   "description": "api for intervey",
+   "description": "api for absqra",
    "main": "build/server/main.js",
    "types": "lib/types",
    "scripts": {
@@ -15,17 +15,18 @@
    },
    "repository": {
       "type": "git",
-      "url": "git+ssh://git@github.com/anvlkv/intervey-api.git"
+      "url": "git+ssh://git@github.com/anvlkv/absqra-server.git"
    },
    "keywords": [
-      "intervey"
+      "absqra",
+      "server"
    ],
    "author": "Aleksandr Novolokov",
    "license": "MIT",
    "bugs": {
-      "url": "https://github.com/anvlkv/intervey-api/issues"
+      "url": "https://github.com/anvlkv/absqra-server/issues"
    },
-   "homepage": "https://github.com/anvlkv/intervey-api#readme",
+   "homepage": "https://github.com/anvlkv/absqra-server#readme",
    "dependencies": {
       "co-body": "^5.2.0",
       "fast-json-patch": "^2.0.6",
