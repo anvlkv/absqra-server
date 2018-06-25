@@ -39,7 +39,9 @@ function populateDefaults(meta: EntityMetadata, cyclicEntities: string[] = []): 
     try {
         if (meta.columns) {
             meta.columns.forEach(column => {
-                defaultEntity[column.propertyName] = column.default || null;
+                if (!column.isGenerated) {
+                    defaultEntity[column.propertyName] = column.default || null;
+                }
             });
         }
         if (meta.relations) {

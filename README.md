@@ -1,7 +1,5 @@
-# Awesome Project Build with TypeORM
-        
-Steps to run this project:
+# absQra
 
-1. Run `npm i` command
-2. Setup database settings inside `ormconfig.json` file
-3. Run `npm start` command
+this project is an attempt to design a tool for interactive surveys...
+
+[CC-BY-SA 4.0](LICENSE.md)
