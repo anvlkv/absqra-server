@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as Router from 'koa-router';
 
 export function exportRoutes(router: Router, name: string) {
-    const msg = `routes exported to /lib/router/${name}.ts`;
+    const msg = `${router.stack.length} routes exported to /lib/router/${name}.ts`;
     console.time(msg);
 
     let fileContent = router.stack.reduce((content, layer, at, all): string => {

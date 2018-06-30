@@ -6,11 +6,11 @@ import { environment } from '../environments/environment';
 import session = require('koa-session-async');
 import { createCRUDRouterForEntities } from './simpleCrud';
 import { Project, Question, Sequence, Step } from '../entity';
-import { exportRoutes } from '../util/exportRoutes';
 import { RespondentsList } from '../entity/respondentsList';
 import { SequenceResponse } from '../entity/response';
 import { logger, trimmer, xResponseTime } from '../util/helpers';
 import { startWebServer } from './webServer';
+import * as bodyParser from 'koa-body';
 
 
 const port = environment.apiPort;
@@ -25,7 +25,7 @@ console.time('Connected to PostgresSQL instance');
 
 (async () => {
     const connection = await createConnection()
-        .catch(e => console.log('TypeORM connection error: ', e));
+    .catch(e => console.log('TypeORM connection error: ', e));
 
     console.timeEnd('Connected to PostgresSQL instance');
 
@@ -52,7 +52,7 @@ console.time('Connected to PostgresSQL instance');
         Sequence,
         Step,
         Question,
-        Response: SequenceResponse,
+        SequenceResponse,
         RespondentsList
     }, 'crud', true);
     // /TODO
@@ -64,11 +64,11 @@ console.time('Connected to PostgresSQL instance');
 
 
     app.use(async (ctx, next) => {
-       await next();
+        await next();
 
-       if (ctx.status == 204 && ctx.method == 'GET') {
-           ctx.throw(404, 'Not found');
-       }
+        if (ctx.status == 204 && ctx.method == 'GET') {
+            ctx.throw(404, 'Not found');
+        }
     });
 
     app.use(xResponseTime());
@@ -80,8 +80,10 @@ console.time('Connected to PostgresSQL instance');
 
     app.use(cors(myCorsOptions));
 
-    app.use(crudRouter.routes())
-        .use(crudRouter.allowedMethods());
+
+    app.use(bodyParser())
+    .use(crudRouter.routes())
+    .use(crudRouter.allowedMethods());
 
     app.listen(port, () => {
         console.timeEnd('App listening on port ' + port);

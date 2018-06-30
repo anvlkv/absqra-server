@@ -50,33 +50,33 @@
       "nodemon": "^1.17.5",
       "pg": "^7.4.3",
       "pluralize": "^7.0.0",
-      "typeorm": "^0.2.6"
+      "typeorm": "^0.2.7"
    },
    "devDependencies": {
       "@types/jasmine": "2.5.38",
       "@types/json-patch": "0.0.30",
-      "@types/koa": "^2.0.45",
-      "@types/koa-router": "^7.0.28",
+      "@types/koa": "^2.0.46",
+      "@types/koa-router": "^7.0.30",
       "@types/koa-send": "^4.1.1",
       "@types/koa-session": "^3.0.6",
       "@types/koa-static": "^4.0.0",
       "@types/koa2-cors": "^2.0.1",
-      "@types/node": "^8.10.17",
+      "@types/node": "^8.10.20",
       "@types/pluralize": "0.0.28",
       "barrelsby": "0.0.8",
-      "concurrently": "^3.5.1",
+      "concurrently": "^3.6.0",
       "debug": "^3.1.0",
       "jasmine-core": "~2.5.2",
       "jasmine-spec-reporter": "~3.2.0",
-      "karma": "~1.4.1",
+      "karma": "^2.0.4",
       "karma-chrome-launcher": "~2.0.0",
       "karma-cli": "~1.0.1",
       "karma-coverage-istanbul-reporter": "^0.2.0",
       "karma-jasmine": "^1.1.2",
       "karma-jasmine-html-reporter": "^0.2.2",
-      "ts-node": "^6.0.5",
+      "ts-node": "^6.2.0",
       "tslint": "^5.10.0",
       "typescript": "2.7.2",
-      "typescript-ioc": "^1.2.3"
+      "typescript-ioc": "^1.2.4"
    }
 }
