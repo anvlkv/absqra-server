@@ -20,9 +20,10 @@ function lowerFistLetter (string) {
     return string.charAt(0).toLowerCase() + string.slice(1);
 }
 
-function handleError(err, ctx, next) {
+function handleError(err, ctx, next, debugContext?) {
     if (!environment.production) {
         ctx.body = {
+            debugContext,
             err,
             request: ctx.request.body
         };
@@ -130,7 +131,7 @@ export function createCRUDRouterForEntities (entities: {[name: string]: any },
 
                 return next();
             } catch (e) {
-                handleError(e, ctx, next);
+                handleError(e, ctx, next, `repo${localPluralizedPostfix}|${ctx.method}:${ctx.req.url}`);
             }
         }, {name: `repo${localPluralizedPostfix}`});
 
@@ -143,7 +144,6 @@ export function createCRUDRouterForEntities (entities: {[name: string]: any },
                     return;
                 }
                 const entry = await Repo.findOne(id);
-
 
                 switch (ctx.method) {
                     case 'GET': {
@@ -161,7 +161,7 @@ export function createCRUDRouterForEntities (entities: {[name: string]: any },
                         }
 
                         const saveResult = await Repo.save(entry);
-                        console.log(saveResult);
+                        // console.log(saveResult);
                         ctx.body = await Repo.findOne(id);
                         break;
                     }
@@ -179,7 +179,7 @@ export function createCRUDRouterForEntities (entities: {[name: string]: any },
                             }
 
                             const saveResult = await Repo.save(entry);
-                            console.log(saveResult);
+                            // console.log(saveResult);
 
                             ctx.body = await Repo.findOne(id);
                         }
@@ -192,7 +192,7 @@ export function createCRUDRouterForEntities (entities: {[name: string]: any },
                     case 'DELETE': {
 
                         const deleteResult = await Repo.delete(id);
-                        console.log(deleteResult);
+                        // console.log(deleteResult);
                         ctx.body = entry;
                         break;
                     }
@@ -203,7 +203,7 @@ export function createCRUDRouterForEntities (entities: {[name: string]: any },
 
                 return next();
             } catch (e) {
-                handleError(e, ctx, next);
+                handleError(e, ctx, next, `entity${localPostfix}|${ctx.method}:${ctx.req.url}`);
             }
         }, {name: `entity${localPostfix}`});
 
