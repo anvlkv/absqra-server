@@ -11,8 +11,11 @@ export function exportRoutes(router: Router, name: string) {
     ${layer.name}: {
         path: '${layer.path}',
         params: [${layer.paramNames.map(param => `'${param.name}'`).join(', ')}],
+        typeName: '${layer.stack[layer.stack.length - 1].name}'
     }${at < all.length - 1 ? ',' : '\n'}`
-    }, `export const ${name} = {`);
+    }, `import { ApiRoute } from 'api';
+    
+    export const ${name}: {[routeName: string]: ApiRoute} = {`);
 
     fileContent += '};\n';
 

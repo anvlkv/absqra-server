@@ -36,7 +36,9 @@ function handleError(err, ctx, next, debugContext?) {
 }
 
 function populateDefaults(meta: EntityMetadata, cyclicEntities: string[] = []): any {
-    const defaultEntity = {};
+    const defaultEntity = {
+        id: '0'
+    };
     try {
         if (meta.columns) {
             meta.columns.forEach(column => {
@@ -106,106 +108,123 @@ export function createCRUDRouterForEntities (entities: {[name: string]: any },
         const localPluralizedPostfix = generateRouterNamePostfix(pluralizedName);
         const defaultEntity = populateDefaults(Repo.metadata);
 
+        const repoMiddleware = function() {
 
-        router.register(`${crudPrefix}/${pluralizedName}`, ['GET', 'POST'], async (ctx, next) => {
-            try {
-                switch (ctx.method) {
-                    case 'GET': {
-                        const findManyOptions: FindManyOptions<any> = {};
-                        if (parentName) {
-                            findManyOptions.where = `"${parentName}Id"=${ctx.params[`${parentName}Id`]}`;
-                        }
-                        ctx.body = await Repo.find(findManyOptions);
-                        break;
-                    }
-                    case 'POST': {
-                        const entry = new Entity(ctx.request.body);
-                        await Repo.save(entry);
-                        ctx.body = await Repo.findOne(entry.id);
-                        break;
-                    }
-                    default: {
-                        throw new Error(`can not ${ctx.method} on repo${localPluralizedPostfix}`);
-                    }
-                }
-
-                return next();
-            } catch (e) {
-                handleError(e, ctx, next, `repo${localPluralizedPostfix}|${ctx.method}:${ctx.req.url}`);
-            }
-        }, {name: `repo${localPluralizedPostfix}`});
-
-        router.register(`${crudPrefix}/${pluralizedName}/:${name}Id`, ['GET', 'POST', 'PATCH', 'DELETE'], async (ctx, next) => {
-            try {
-                const id = Number(ctx.params[`${name}Id`]);
-
-                if (id === 0) {
-                    ctx.body = defaultEntity;
-                    return;
-                }
-                const entry = await Repo.findOne(id);
-
-                switch (ctx.method) {
-                    case 'GET': {
-                        ctx.body = entry;
-                        break;
-                    }
-                    case 'POST': {
-                        const requestBodyFields = Object.keys(ctx.request.body);
-
-                        console.log(requestBodyFields);
-
-                        for (let key in requestBodyFields) {
-                            key = requestBodyFields[key];
-                            entry[key] = ctx.request.body[key];
-                        }
-
-                        const saveResult = await Repo.save(entry);
-                        // console.log(saveResult);
-                        ctx.body = await Repo.findOne(id);
-                        break;
-                    }
-                    case 'PATCH': {
-                        const patchDocument: Operation[] = ctx.request.body;
-                        const patchErrors = validate(patchDocument, entry);
-                        if (!patchErrors) {
-                            let operationResult;
-
-                            if (!!(Repo.metadata.oneToManyRelations.length || Repo.metadata.manyToManyRelations.length)) {
-                                operationResult = patchDocument.reduce(applyReducer, entry);
+            const mw = async (ctx, next) => {
+                try {
+                    switch (ctx.method) {
+                        case 'GET': {
+                            const findManyOptions: FindManyOptions<any> = {};
+                            if (parentName) {
+                                findManyOptions.where = `"${parentName}Id"=${ctx.params[`${parentName}Id`]}`;
                             }
-                            else {
-                                operationResult = applyPatch(entry, patchDocument).newDocument;
+                            ctx.body = await Repo.find(findManyOptions);
+                            break;
+                        }
+                        case 'POST': {
+                            const entry = new Entity(ctx.request.body);
+                            await Repo.save(entry);
+                            ctx.body = await Repo.findOne(entry.id);
+                            break;
+                        }
+                        default: {
+                            throw new Error(`can not ${ctx.method} on repo${localPluralizedPostfix}`);
+                        }
+                    }
+
+                    return next();
+                } catch (e) {
+                    handleError(e, ctx, next, `repo${localPluralizedPostfix}|${ctx.method}:${ctx.req.url}`);
+                }
+            };
+
+            Object.defineProperty(mw, 'name', {value: name, writable: false});
+
+            return mw;
+        };
+
+        const entityMiddlewear = function() {
+            const mw = async (ctx, next) => {
+                try {
+                    const id = Number(ctx.params[`${name}Id`]);
+
+                    if (id === 0) {
+                        ctx.body = defaultEntity;
+                        return;
+                    }
+                    const entry = await Repo.findOne(id);
+
+                    switch (ctx.method) {
+                        case 'GET': {
+                            ctx.body = entry;
+                            break;
+                        }
+                        case 'POST': {
+                            const requestBodyFields = Object.keys(ctx.request.body);
+
+                            console.log(requestBodyFields);
+
+                            for (let key in requestBodyFields) {
+                                key = requestBodyFields[key];
+                                entry[key] = ctx.request.body[key];
                             }
 
                             const saveResult = await Repo.save(entry);
                             // console.log(saveResult);
-
                             ctx.body = await Repo.findOne(id);
+                            break;
                         }
-                        else {
-                            ctx.status = 400;
-                            ctx.body = patchErrors;
-                        }
-                        break;
-                    }
-                    case 'DELETE': {
+                        case 'PATCH': {
+                            const patchDocument: Operation[] = ctx.request.body;
+                            const patchErrors = validate(patchDocument, entry);
+                            if (!patchErrors) {
+                                let operationResult;
 
-                        const deleteResult = await Repo.delete(id);
-                        // console.log(deleteResult);
-                        ctx.body = entry;
-                        break;
+                                if (!!(Repo.metadata.oneToManyRelations.length || Repo.metadata.manyToManyRelations.length)) {
+                                    operationResult = patchDocument.reduce(applyReducer, entry);
+                                }
+                                else {
+                                    operationResult = applyPatch(entry, patchDocument).newDocument;
+                                }
+
+                                const saveResult = await Repo.save(entry);
+                                // console.log(saveResult);
+
+                                ctx.body = await Repo.findOne(id);
+                            }
+                            else {
+                                ctx.status = 400;
+                                ctx.body = patchErrors;
+                            }
+                            break;
+                        }
+                        case 'DELETE': {
+
+                            const deleteResult = await Repo.delete(id);
+                            // console.log(deleteResult);
+                            ctx.body = entry;
+                            break;
+                        }
+                        default: {
+                            throw new Error(`can not ${ctx.method} on repo${localPluralizedPostfix}`);
+                        }
                     }
-                    default: {
-                        throw new Error(`can not ${ctx.method} on repo${localPluralizedPostfix}`);
-                    }
+
+                    return next();
+                } catch (e) {
+                    handleError(e, ctx, next, `entity${localPostfix}|${ctx.method}:${ctx.req.url}`);
                 }
+            };
 
-                return next();
-            } catch (e) {
-                handleError(e, ctx, next, `entity${localPostfix}|${ctx.method}:${ctx.req.url}`);
-            }
-        }, {name: `entity${localPostfix}`});
+            Object.defineProperty(mw, 'name', {value: name, writable: false});
+
+            return mw;
+        };
+
+
+        router.register(`${crudPrefix}/${pluralizedName}`, ['GET', 'POST'], repoMiddleware(), {name: `repo${localPluralizedPostfix}`});
+
+        router.register(`${crudPrefix}/${pluralizedName}/:${name}Id`, ['GET', 'POST', 'PATCH', 'DELETE'], entityMiddlewear(), {name: `entity${localPostfix}`});
 
 
         const relatedEntities = Repo.metadata.relations.reduce((related, meta) => {
