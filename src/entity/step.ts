@@ -16,7 +16,7 @@ import { enumerableColumnProperties } from '../util/helpers';
 })
 export class Step extends OrderableBase {
 
-    @Column({...enumerableColumnProperties, nullable: true})
+    @Column({...enumerableColumnProperties})
     type: StepTypes;
 
     @ManyToOne(type => Sequence, sequence => sequence.referencedBySteps, {

@@ -1,25 +1,297 @@
 import * as Router from 'koa-router';
-import * as koaBody from 'koa-body';
-import { FindOneOptions, getConnection } from 'typeorm';
+import { getConnection } from 'typeorm';
 import { Repository } from 'typeorm/repository/Repository';
 import { applyPatch, Operation, applyReducer, validate } from 'fast-json-patch';
 import * as pluralize from 'pluralize';
 import { environment } from '../environments/environment';
 import { FindManyOptions } from 'typeorm/find-options/FindManyOptions';
-import { exportRoutes } from '../util/exportRoutes';
 import { EntityMetadata } from 'typeorm/metadata/EntityMetadata';
 
-// TODO: export class CRUDRouterManager {
-//
-// }
-function capitalizeFirstLetter (string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
+export class CRUDRouterManager {
 
-function lowerFistLetter (string) {
-    return string.charAt(0).toLowerCase() + string.slice(1);
-}
+    private children: CRUDRouterManager[] = [];
 
+    private entities: {[name: string]: any };
+
+    private parentName: string;
+
+    constructor(
+        entities: {[name: string]: any },
+        private crudPrefix = '',
+        public router = new Router(),
+        private routeNamePostfix = '',
+        private parentRepo: Repository<any> = null,
+        parentEntities = {},
+        private root: CRUDRouterManager = null
+    ) {
+        if (parentRepo) {
+            this.parentName = lowerFistLetter(parentRepo.metadata.name);
+        }
+
+        this.entities = {
+            ...parentEntities,
+            ...entities
+        };
+
+        if (this.crudPrefix[0] !== '/') {
+           this.crudPrefix = `/${this.crudPrefix}`
+        }
+
+        for (const entityName in entities) {
+            this.registerEntity(entityName);
+            this.registerRepo(entityName);
+        }
+
+        for (const entityName in entities) {
+            this.registerRelations(entityName);
+        }
+    }
+
+    public addEntity(entity: Function) {
+        this.entities[entity.name] = entity;
+        this.registerEntity(entity.name);
+        this.addRepo(entity);
+    }
+
+    public addRepo(entity: Function) {
+        this.entities[entity.name] = entity;
+        this.registerRepo(entity.name);
+    }
+
+    public registerEntity(entityName: string) {
+        let Repo: Repository<any>;
+        const entity = this.entities[entityName];
+
+        if (!entity.isEntityRegistered) {
+            try {
+                Repo = getConnection().getRepository(entity);
+            } catch (e) {
+                console.error(e);
+                throw new Error(`${entityName} is not an Entity... or cannot get repo`);
+            }
+            this.registerEntityRouter(Repo, this.entities[entityName]);
+
+            Object.defineProperty(this.entities[entityName], 'isEntityRegistered', {value: true, writable: false})
+        }
+    }
+
+    public registerRepo(entityName: string) {
+        let Repo: Repository<any>;
+        const entity = this.entities[entityName];
+
+        if (entity.isRepoRegistered) {
+            throw new Error(`repo [${entityName}] is already registered`);
+        }
+        try {
+            Repo = getConnection().getRepository(entity);
+        } catch (e) {
+            console.error(e);
+            throw new Error(`${entityName} is not an Entity... or cannot get repo`);
+        }
+
+        this.registerRepoRouter(Repo, this.entities[entityName]);
+    }
+
+    private registerRelations(entityName: string) {
+        let Repo: Repository<any>;
+        const entity = this.entities[entityName];
+
+        try {
+            Repo = getConnection().getRepository(entity);
+        } catch (e) {
+            console.error(e);
+            throw new Error(`${entityName} is not an Entity... or cannot get repo`);
+        }
+
+        this.registerRelationRouter(Repo, this.entities[entityName]);
+    }
+
+    private registerRelationRouter(Repo: Repository<any>, Entity: Function) {
+        const name = lowerFistLetter(Entity.name);
+        const localPostfix = this.generateRouterNamePostfix(name);
+        const pluralizedName = pluralize(name);
+
+        const relatedRoutesTask = Repo.metadata.relations.reduce((related, meta) => {
+            const relationName = (<Function>meta.type).name;
+            if (!this.entities[relationName]) {
+                if (meta.isManyToOne || meta.isOneToOne) {
+                    related.entities[relationName] = meta.type;
+                }
+                else if (!meta.isOwning) {
+                    related.repos[relationName] = meta.type;
+                }
+
+
+            }
+            return related
+        }, {repos: {}, entities: {}});
+
+
+        for (const entityName in relatedRoutesTask.entities) {
+            this.addEntity(relatedRoutesTask.entities[entityName]);
+        }
+
+        if (Object.keys(relatedRoutesTask.repos).length) {
+            this.children.push(
+                new CRUDRouterManager(
+                    relatedRoutesTask.repos,
+                    `${this.crudPrefix}/${pluralizedName}/:${name}Id`,
+                    this.router,
+                    localPostfix,
+                    Repo,
+                    this.entities,
+                    this.root || this)
+            )
+        }
+    }
+
+    private generateRouterNamePostfix (name: string) {
+        let namePostfix = '';
+        if (this.routeNamePostfix) {
+            namePostfix = `${capitalizeFirstLetter(name)}Of${this.routeNamePostfix}`;
+        }
+        else {
+            namePostfix = capitalizeFirstLetter(name)
+        }
+        return namePostfix;
+    }
+
+    private registerEntityRouter(Repo: Repository<any>, Entity: Function) {
+        const name = lowerFistLetter(Entity.name);
+        const localPostfix = capitalizeFirstLetter(name);
+        const pluralizedName = pluralize(name);
+        const prefix = this.root ? this.root.crudPrefix : this.crudPrefix;
+        this.router.register(`${prefix}/${pluralizedName}/:${name}Id`, ['GET', 'POST', 'PATCH', 'DELETE'], this.generateEntityMiddlewear(Repo, Entity, name, localPostfix), {name: `entity${localPostfix}`});
+    }
+
+    private registerRepoRouter(Repo: Repository<any>, Entity: Function) {
+        const name = lowerFistLetter(Entity.name);
+        const localPostfix = this.generateRouterNamePostfix(name);
+        const pluralizedName = pluralize(name);
+        const localPluralizedPostfix = this.generateRouterNamePostfix(pluralizedName);
+
+        this.router.register(`${this.crudPrefix}/${pluralizedName}`, ['GET', 'POST'], this.generateRepoMiddlewear(Repo, Entity, name, localPluralizedPostfix, this.parentName), {name: `repo${localPluralizedPostfix}`});
+    }
+
+    private generateEntityMiddlewear (Repo: Repository<any>, Entity: Function, name: string, localPostfix?: string) {
+        const mw = async (ctx, next) => {
+            try {
+                const id = Number(ctx.params[`${name}Id`]);
+
+                if (id === 0) {
+                    ctx.body = populateDefaults(Repo.metadata);
+                    return;
+                }
+                const entry = await Repo.findOne(id);
+
+                switch (ctx.method) {
+                    case 'GET': {
+                        ctx.body = entry;
+                        break;
+                    }
+                    case 'POST': {
+                        const requestBodyFields = Object.keys(ctx.request.body);
+
+                        console.log(requestBodyFields);
+
+                        for (let key in requestBodyFields) {
+                            key = requestBodyFields[key];
+                            entry[key] = ctx.request.body[key];
+                        }
+
+                        const saveResult = await Repo.save(entry);
+                        ctx.body = await Repo.findOne(id);
+                        break;
+                    }
+                    case 'PATCH': {
+                        const patchDocument: Operation[] = ctx.request.body;
+                        const patchErrors = validate(patchDocument, entry);
+                        if (!patchErrors) {
+                            let operationResult;
+
+                            if (!!(Repo.metadata.oneToManyRelations.length || Repo.metadata.manyToManyRelations.length)) {
+                                operationResult = patchDocument.reduce(applyReducer, entry);
+                            }
+                            else {
+                                operationResult = applyPatch(entry, patchDocument).newDocument;
+                            }
+
+                            const saveResult = await Repo.save(operationResult);
+
+                            ctx.body = await Repo.findOne(id);
+                        }
+                        else {
+                            ctx.status = 400;
+                            ctx.body = patchErrors;
+                        }
+                        break;
+                    }
+                    case 'DELETE': {
+                        const deleteResult = await Repo.delete(id);
+                        ctx.body = entry;
+                        break;
+                    }
+                    default: {
+                        throw new Error(`can not ${ctx.method} on entity ${localPostfix}`);
+                    }
+                }
+
+                return next();
+            } catch (e) {
+                handleError(e, ctx, next, `entity${localPostfix}|${ctx.method}:${ctx.req.url}`);
+            }
+        };
+
+        Object.defineProperty(mw, 'name', {value: name, writable: false});
+
+        return mw;
+    }
+
+    private generateRepoMiddlewear (Repo: Repository<any>, Entity, name: string, localPostfix = '', localPluralizedPostfix = '') {
+        const mw = async (ctx, next) => {
+            try {
+                const parentId = this.parentName ? ctx.params[`${this.parentName}Id`] : null;
+                const findManyOptions: FindManyOptions<any> = {};
+                if (this.parentName) {
+                    findManyOptions.where = `"${this.parentName}Id"=${parentId}`;
+                }
+                switch (ctx.method) {
+                    case 'GET': {
+                        ctx.body = await Repo.find(findManyOptions);
+                        break;
+                    }
+                    case 'POST': {
+                        const entry = new Entity(ctx.request.body);
+                        await Repo.save(entry);
+
+                        if (this.parentRepo && parentId) {
+                            const parentEntry = await this.parentRepo.findOne(parentId);
+                            const existingContent = await Repo.find(findManyOptions);
+                            parentEntry[pluralize(name)] = existingContent || [];
+                            parentEntry[pluralize(name)].push(entry);
+                            await this.parentRepo.save(parentEntry);
+                        }
+
+                        ctx.body = await Repo.findOne(entry.id);
+                        break;
+                    }
+                    default: {
+                        throw new Error(`can not ${ctx.method} on repo${localPluralizedPostfix}`);
+                    }
+                }
+
+                return next();
+            } catch (e) {
+                handleError(e, ctx, next, `repo${localPluralizedPostfix}|${ctx.method}:${ctx.req.url}`);
+            }
+        };
+
+        Object.defineProperty(mw, 'name', {value: name, writable: false});
+
+        return mw;
+    }
+
+}
 function handleError(err, ctx, next, debugContext?) {
     if (!environment.production) {
         ctx.body = {
@@ -68,181 +340,11 @@ function populateDefaults(meta: EntityMetadata, cyclicEntities: string[] = []): 
     return defaultEntity;
 }
 
-export function createCRUDRouterForEntities (entities: {[name: string]: any },
-                                             crudPrefix = '',
-                                             exportGeneratedRoutes = false,
-                                             router = new Router(),
-                                             routeNamePostfix = '',
-                                             parentName?: string) {
-    const generateRouterNamePostfix = function (name) {
-        let namePostfix = '';
-        if (routeNamePostfix) {
-            namePostfix = `${capitalizeFirstLetter(name)}Of${routeNamePostfix}`;
-        }
-        else {
-            namePostfix = capitalizeFirstLetter(name)
-        }
-        return namePostfix;
-    };
-
-    if (crudPrefix && crudPrefix[0] != '/') {
-        crudPrefix = `/${crudPrefix}`
-    }
-
-
-
-    for (const entityName in entities) {
-        let Repo: Repository<any>;
-
-        try {
-            Repo = getConnection().getRepository(entities[entityName]);
-        } catch (e) {
-            console.error(e);
-            throw new Error(`${entityName} is not an Entity... or cannot get repo`);
-        }
-
-        const name = lowerFistLetter(entityName);
-        const Entity = entities[entityName];
-        const localPostfix = generateRouterNamePostfix(name);
-        const pluralizedName = pluralize(name);
-        const localPluralizedPostfix = generateRouterNamePostfix(pluralizedName);
-        const defaultEntity = populateDefaults(Repo.metadata);
-
-        const repoMiddleware = function() {
-
-            const mw = async (ctx, next) => {
-                try {
-                    switch (ctx.method) {
-                        case 'GET': {
-                            const findManyOptions: FindManyOptions<any> = {};
-                            if (parentName) {
-                                findManyOptions.where = `"${parentName}Id"=${ctx.params[`${parentName}Id`]}`;
-                            }
-                            ctx.body = await Repo.find(findManyOptions);
-                            break;
-                        }
-                        case 'POST': {
-                            const entry = new Entity(ctx.request.body);
-                            await Repo.save(entry);
-                            ctx.body = await Repo.findOne(entry.id);
-                            break;
-                        }
-                        default: {
-                            throw new Error(`can not ${ctx.method} on repo${localPluralizedPostfix}`);
-                        }
-                    }
-
-                    return next();
-                } catch (e) {
-                    handleError(e, ctx, next, `repo${localPluralizedPostfix}|${ctx.method}:${ctx.req.url}`);
-                }
-            };
-
-            Object.defineProperty(mw, 'name', {value: name, writable: false});
-
-            return mw;
-        };
-
-        const entityMiddlewear = function() {
-            const mw = async (ctx, next) => {
-                try {
-                    const id = Number(ctx.params[`${name}Id`]);
-
-                    if (id === 0) {
-                        ctx.body = defaultEntity;
-                        return;
-                    }
-                    const entry = await Repo.findOne(id);
-
-                    switch (ctx.method) {
-                        case 'GET': {
-                            ctx.body = entry;
-                            break;
-                        }
-                        case 'POST': {
-                            const requestBodyFields = Object.keys(ctx.request.body);
-
-                            console.log(requestBodyFields);
-
-                            for (let key in requestBodyFields) {
-                                key = requestBodyFields[key];
-                                entry[key] = ctx.request.body[key];
-                            }
-
-                            const saveResult = await Repo.save(entry);
-                            // console.log(saveResult);
-                            ctx.body = await Repo.findOne(id);
-                            break;
-                        }
-                        case 'PATCH': {
-                            const patchDocument: Operation[] = ctx.request.body;
-                            const patchErrors = validate(patchDocument, entry);
-                            if (!patchErrors) {
-                                let operationResult;
-
-                                if (!!(Repo.metadata.oneToManyRelations.length || Repo.metadata.manyToManyRelations.length)) {
-                                    operationResult = patchDocument.reduce(applyReducer, entry);
-                                }
-                                else {
-                                    operationResult = applyPatch(entry, patchDocument).newDocument;
-                                }
-
-                                const saveResult = await Repo.save(entry);
-                                // console.log(saveResult);
-
-                                ctx.body = await Repo.findOne(id);
-                            }
-                            else {
-                                ctx.status = 400;
-                                ctx.body = patchErrors;
-                            }
-                            break;
-                        }
-                        case 'DELETE': {
-
-                            const deleteResult = await Repo.delete(id);
-                            // console.log(deleteResult);
-                            ctx.body = entry;
-                            break;
-                        }
-                        default: {
-                            throw new Error(`can not ${ctx.method} on repo${localPluralizedPostfix}`);
-                        }
-                    }
-
-                    return next();
-                } catch (e) {
-                    handleError(e, ctx, next, `entity${localPostfix}|${ctx.method}:${ctx.req.url}`);
-                }
-            };
-
-            Object.defineProperty(mw, 'name', {value: name, writable: false});
-
-            return mw;
-        };
-
-
-        router.register(`${crudPrefix}/${pluralizedName}`, ['GET', 'POST'], repoMiddleware(), {name: `repo${localPluralizedPostfix}`});
-
-        router.register(`${crudPrefix}/${pluralizedName}/:${name}Id`, ['GET', 'POST', 'PATCH', 'DELETE'], entityMiddlewear(), {name: `entity${localPostfix}`});
-
-
-        const relatedEntities = Repo.metadata.relations.reduce((related, meta) => {
-            if (!meta.isOwning) {
-
-                related[(<() => any> meta.type).name] = meta.type;
-            }
-            return related
-        }, {});
-
-        if (Object.keys(relatedEntities).length) {
-            createCRUDRouterForEntities(relatedEntities, `${crudPrefix}/${pluralizedName}/:${name}Id`, false, router, localPostfix, name);
-        }
-    }
-
-    if (exportGeneratedRoutes) {
-        exportRoutes(router, 'CRUDRouter');
-    }
-
-    return router;
+function capitalizeFirstLetter (string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+function lowerFistLetter (string) {
+    return string.charAt(0).toLowerCase() + string.slice(1);
+}
+

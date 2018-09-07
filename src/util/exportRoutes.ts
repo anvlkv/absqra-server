@@ -5,7 +5,11 @@ export function exportRoutes(router: Router, name: string) {
     const msg = `${router.stack.length} routes exported to /lib/router/${name}.ts`;
     console.time(msg);
 
-    let fileContent = router.stack.reduce((content, layer, at, all): string => {
+    const sortedStack = router.stack.sort((a, b) => {
+        return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+    });
+
+    let fileContent = sortedStack.reduce((content, layer, at, all): string => {
         // unindent
         return `${content}
     ${layer.name}: {
@@ -15,7 +19,13 @@ export function exportRoutes(router: Router, name: string) {
     }${at < all.length - 1 ? ',' : '\n'}`
     }, `import { ApiRoute } from 'api';
     
-    export const ${name}: {[routeName: string]: ApiRoute} = {`);
+    export const ${name}: {${(() => {
+        return sortedStack.reduce((content, layer, at, all): string => {
+            return `${content}
+            ${layer.name}: ApiRoute;`
+        }, '');
+    })()}
+    } = {`);
 
     fileContent += '};\n';
 

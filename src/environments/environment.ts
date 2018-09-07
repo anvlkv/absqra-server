@@ -10,10 +10,14 @@ switch (env) {
         break;
     case 'debug':
         tempEnv = debug.default;
+        console.log(tempEnv);
         break;
     default:
         tempEnv = dev.default;
+        console.log(tempEnv);
         break;
 }
+
+console.info(`ENVIRONMENT: [${env}]`);
 
 export const environment = tempEnv;

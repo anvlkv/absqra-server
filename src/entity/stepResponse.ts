@@ -6,6 +6,7 @@ import { ResponseBody } from './responseBody';
 
 @Entity()
 export class StepResponse extends Base {
+    // should be OneToMany?
     @ManyToOne(type => Step)
     @JoinColumn()
     step: Step;

@@ -9,7 +9,7 @@ import { enumerableColumnProperties } from '../util/helpers';
 
 @Entity()
 export class Question extends Base {
-    @Column({type: 'char', length: 256, nullable: true})
+    @Column({type: 'char', length: 256, default: 'new question'})
     name?: string;
 
     @Column({type: 'char', length: 2000, nullable: true})
@@ -18,7 +18,8 @@ export class Question extends Base {
 
 
     @ManyToOne(type => QuestionContentAsset, {
-        cascade: true
+        cascade: true,
+        eager: true
     })
     @JoinTable()
     content: QuestionContentAsset;

@@ -7,10 +7,10 @@ export abstract class Base {
     @PrimaryGeneratedColumn()
     id?: number;
 
-    @CreateDateColumn({type: 'timestamp without time zone'})
+    @CreateDateColumn({type: 'timestamp with time zone'})
     createdDate?: Date;
 
-    @UpdateDateColumn({type: 'timestamp without time zone'})
+    @UpdateDateColumn({type: 'timestamp with time zone'})
     updatedDate?: Date;
 
     constructor(data?: any, skipKeys: string[] = []) {

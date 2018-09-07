@@ -1,17 +1,16 @@
 import * as Koa from 'koa';
 import * as helmet from 'koa-helmet';
-import * as cors from 'koa2-cors';
+import * as cors from '@koa/cors';
+import * as bodyParser from 'koa-body';
+import * as session from 'koa-session-async';
+
 import { createConnection } from 'typeorm';
 import { environment } from '../environments/environment';
-import session = require('koa-session-async');
-import { createCRUDRouterForEntities } from './simpleCrud';
-import { Project, Question, Sequence, Step } from '../entity';
-import { RespondentsList } from '../entity/respondentsList';
-import { SequenceResponse } from '../entity/response';
+import { CRUDRouterManager } from './simpleCrud';
+import { Project, Question, Sequence, Step, RespondentsList, SequenceResponse} from '../entity';
 import { logger, trimmer, xResponseTime } from '../util/helpers';
 import { startWebServer } from './webServer';
-import * as bodyParser from 'koa-body';
-
+import { exportRoutes } from '../util/exportRoutes';
 
 const port = environment.apiPort;
 
@@ -46,21 +45,25 @@ console.time('Connected to PostgresSQL instance');
     const app = new Koa();
 
 
-    // TODO: learn to do it as part of build.
-    const crudRouter = createCRUDRouterForEntities({
+    const crudRouterManager = new CRUDRouterManager({
         Project,
         Sequence,
-        Step,
         Question,
         SequenceResponse,
         RespondentsList
-    }, 'crud', true);
+    }, 'crud');
+
+
+    // TODO: learn to do it as part of build.
+    const crudRouter = crudRouterManager.router;
+    exportRoutes(crudRouterManager.router, 'CRUDRouter');
     // /TODO
 
     app.keys = environment.secret;
 
-    app.use(session(CONFIG, app));
+    app.use(session(CONFIG, app))
     app.use(trimmer());
+    app.use(cors(myCorsOptions));
 
 
     app.use(async (ctx, next) => {
@@ -68,6 +71,9 @@ console.time('Connected to PostgresSQL instance');
 
         if (ctx.status == 204 && ctx.method == 'GET') {
             ctx.throw(404, 'Not found');
+            if (!environment.production) {
+                console.error(`404: Not found [${ctx.req.url}]`)
+            }
         }
     });
 
@@ -78,12 +84,9 @@ console.time('Connected to PostgresSQL instance');
     app.use(helmet());
 
 
-    app.use(cors(myCorsOptions));
-
-
     app.use(bodyParser())
-    .use(crudRouter.routes())
-    .use(crudRouter.allowedMethods());
+        .use(crudRouter.routes())
+        .use(crudRouter.allowedMethods());
 
     app.listen(port, () => {
         console.timeEnd('App listening on port ' + port);
