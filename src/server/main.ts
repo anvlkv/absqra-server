@@ -6,7 +6,7 @@ import * as session from 'koa-session-async';
 
 import { createConnection } from 'typeorm';
 import { environment } from '../environments/environment';
-import { CRUDRouterManager } from './simpleCrud';
+import { CRUDRouterManager } from './crudRouterManager';
 import { Project, Question, Sequence, Step, RespondentsList, SequenceResponse} from '../entity';
 import { logger, trimmer, xResponseTime } from '../util/helpers';
 import { startWebServer } from './webServer';
@@ -61,7 +61,7 @@ console.time('Connected to PostgresSQL instance');
 
     app.keys = environment.secret;
 
-    app.use(session(CONFIG, app))
+    app.use(session(CONFIG, app));
     app.use(trimmer());
     app.use(cors(myCorsOptions));
 

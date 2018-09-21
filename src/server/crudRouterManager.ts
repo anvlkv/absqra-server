@@ -11,13 +11,13 @@ export class CRUDRouterManager {
 
     private children: CRUDRouterManager[] = [];
 
-    private entities: {[name: string]: any };
+    private readonly entities: {[name: string]: any };
 
-    private parentName: string;
+    private readonly parentName: string;
 
     constructor(
         entities: {[name: string]: any },
-        private crudPrefix = '',
+        private readonly crudPrefix = '',
         public router = new Router(),
         private routeNamePostfix = '',
         private parentRepo: Repository<any> = null,
@@ -166,7 +166,6 @@ export class CRUDRouterManager {
 
     private registerRepoRouter(Repo: Repository<any>, Entity: Function) {
         const name = lowerFistLetter(Entity.name);
-        const localPostfix = this.generateRouterNamePostfix(name);
         const pluralizedName = pluralize(name);
         const localPluralizedPostfix = this.generateRouterNamePostfix(pluralizedName);
 
@@ -174,7 +173,7 @@ export class CRUDRouterManager {
     }
 
     private generateEntityMiddlewear (Repo: Repository<any>, Entity: Function, name: string, localPostfix?: string) {
-        const mw = async (ctx, next) => {
+        const middlewear = async (ctx, next) => {
             try {
                 const id = Number(ctx.params[`${name}Id`]);
 
@@ -242,13 +241,13 @@ export class CRUDRouterManager {
             }
         };
 
-        Object.defineProperty(mw, 'name', {value: name, writable: false});
+        Object.defineProperty(middlewear, 'name', {value: name, writable: false});
 
-        return mw;
+        return middlewear;
     }
 
     private generateRepoMiddlewear (Repo: Repository<any>, Entity, name: string, localPostfix = '', localPluralizedPostfix = '') {
-        const mw = async (ctx, next) => {
+        const middlewear = async (ctx, next) => {
             try {
                 const parentId = this.parentName ? ctx.params[`${this.parentName}Id`] : null;
                 const findManyOptions: FindManyOptions<any> = {};
@@ -262,14 +261,17 @@ export class CRUDRouterManager {
                     }
                     case 'POST': {
                         const entry = new Entity(ctx.request.body);
-                        await Repo.save(entry);
+                        const saveResult = await Repo.save(entry);
 
                         if (this.parentRepo && parentId) {
                             const parentEntry = await this.parentRepo.findOne(parentId);
                             const existingContent = await Repo.find(findManyOptions);
                             parentEntry[pluralize(name)] = existingContent || [];
                             parentEntry[pluralize(name)].push(entry);
-                            await this.parentRepo.save(parentEntry);
+                            const parentSaveResult = await this.parentRepo.save(parentEntry);
+                            if (!parentSaveResult[pluralize(name)]) {
+                                throw new Error(`[${pluralize(name)}] is not saved on [${this.parentName}] make sure to use the same names for both relation and related entity name`);
+                            }
                         }
 
                         ctx.body = await Repo.findOne(entry.id);
@@ -286,9 +288,9 @@ export class CRUDRouterManager {
             }
         };
 
-        Object.defineProperty(mw, 'name', {value: name, writable: false});
+        Object.defineProperty(middlewear, 'name', {value: name, writable: false});
 
-        return mw;
+        return middlewear;
     }
 
 }

@@ -22,9 +22,9 @@ export class Question extends Base {
         eager: true
     })
     @JoinTable()
-    content: QuestionContentAsset;
-    @RelationId((question: Question) => question.content)
-    contentId?: number;
+    contentAsset: QuestionContentAsset;
+    @RelationId((question: Question) => question.contentAsset)
+    contentAssetId?: number;
 
 
 
@@ -47,16 +47,16 @@ export class Question extends Base {
         cascade: true
     })
     @JoinTable()
-    questionOptions?: QuestionAsset[];
-    @RelationId((question: Question) => question.questionOptions)
-    questionOptionsIds?: number[];
+    questionAssets?: QuestionAsset[];
+    @RelationId((question: Question) => question.questionAssets)
+    questionAssetsIds?: number[];
 
 
     @OneToMany(type => ResponseAsset, ra => ra.question, {
         cascade: true
     })
     @JoinTable()
-    responseOptions?: ResponseAsset[];
-    @RelationId((question: Question) => question.responseOptions)
-    responseOptionsIds?: number[];
+    responseAssets?: ResponseAsset[];
+    @RelationId((question: Question) => question.responseAssets)
+    responseAssetsIds?: number[];
 }

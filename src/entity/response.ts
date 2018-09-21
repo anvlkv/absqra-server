@@ -8,7 +8,7 @@ import { Respondent } from './respondent';
 @Entity()
 export class SequenceResponse extends Base {
 
-    @ManyToOne(type => Project, project => project.responses)
+    @ManyToOne(type => Project, project => project.sequenceResponses)
     project: Project;
 
     @ManyToOne(type => Sequence)

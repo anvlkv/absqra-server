@@ -5,7 +5,7 @@ import { Question } from './question';
 
 @Entity()
 export class QuestionAsset extends AssetBase {
-    @ManyToOne(type => Question, question => question.questionOptions)
+    @ManyToOne(type => Question, question => question.questionAssets)
     @JoinColumn()
     question: Question;
     @RelationId((question: QuestionAsset) => question.question)

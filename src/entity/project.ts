@@ -42,8 +42,8 @@ export class Project extends Base {
         cascade: true
     })
     @JoinTable()
-    responses: SequenceResponse[];
-    @RelationId((project: Project) => project.responses)
-    responsesIds?: number[];
+    sequenceResponses: SequenceResponse[];
+    @RelationId((project: Project) => project.sequenceResponses)
+    sequenceResponsesIds?: number[];
 
 }
