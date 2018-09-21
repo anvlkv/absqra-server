@@ -6,7 +6,7 @@
    "password": "another**Pa55w0rd!",
    "database": "interveydev",
    "synchronize": true,
-   "logging": false,
+   "logger": "debug",
    "entities": [
       "src/entity/**/*.ts"
    ],

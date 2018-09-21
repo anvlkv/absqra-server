@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as Router from 'koa-router';
 
-export function exportRoutes(router: Router, name: string) {
+export function exportRoutes(router: Router, name: string, absolutePathPrefix = '') {
     const msg = `${router.stack.length} routes exported to /lib/router/${name}.ts`;
     console.time(msg);
 
@@ -13,7 +13,7 @@ export function exportRoutes(router: Router, name: string) {
         // unindent
         return `${content}
     ${layer.name}: {
-        path: '${layer.path}',
+        path: '${absolutePathPrefix}${layer.path}',
         params: [${layer.paramNames.map(param => `'${param.name}'`).join(', ')}],
         typeName: '${layer.stack[layer.stack.length - 1].name}'
     }${at < all.length - 1 ? ',' : '\n'}`

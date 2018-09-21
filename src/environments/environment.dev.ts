@@ -5,5 +5,6 @@ export default {
     host: 'localhost',
     protocol: 'http',
     apiPort: 3000,
-    clientPort: 8080
+    clientPort: 8080,
+    wsprotocol: 'ws'
 };

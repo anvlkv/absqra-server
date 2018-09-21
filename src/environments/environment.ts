@@ -20,4 +20,13 @@ switch (env) {
 
 console.info(`ENVIRONMENT: [${env}]`);
 
-export const environment = tempEnv;
+export const environment: {
+    production?: boolean;
+    secret?: string[];
+    port?: number;
+    host?: string;
+    protocol?: string;
+    apiPort?: number;
+    clientPort?: number;
+    wsprotocol?: string
+} = tempEnv;

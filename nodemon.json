@@ -1,7 +1,7 @@
 {
   "watch": ["src/**/*"],
   "ext": "ts",
-  "ignore": ["src/**/index.ts", "src/client/**/*.*", "lib"],
+  "ignore": ["src/**/index.ts", "src/client/**/*.*", "lib/**/*.*"],
   "exec": "npm run start",
   "killOthers": true
 }
