@@ -175,9 +175,9 @@ export class CRUDRouterManager {
     private generateEntityMiddlewear (Repo: Repository<any>, Entity: Function, name: string, localPostfix?: string) {
         const middlewear = async (ctx, next) => {
             try {
-                const id = Number(ctx.params[`${name}Id`]);
+                const id = ctx.params[`${name}Id`];
 
-                if (id === 0) {
+                if (id === 'default') {
                     ctx.body = populateDefaults(Repo.metadata);
                     return;
                 }
@@ -190,8 +190,6 @@ export class CRUDRouterManager {
                     }
                     case 'POST': {
                         const requestBodyFields = Object.keys(ctx.request.body);
-
-                        console.log(requestBodyFields);
 
                         for (let key in requestBodyFields) {
                             key = requestBodyFields[key];
@@ -252,7 +250,7 @@ export class CRUDRouterManager {
                 const parentId = this.parentName ? ctx.params[`${this.parentName}Id`] : null;
                 const findManyOptions: FindManyOptions<any> = {};
                 if (this.parentName) {
-                    findManyOptions.where = `"${this.parentName}Id"=${parentId}`;
+                    findManyOptions.where = `"${this.parentName}Id"='${parentId}'`;
                 }
                 switch (ctx.method) {
                     case 'GET': {
@@ -310,9 +308,7 @@ function handleError(err, ctx, next, debugContext?) {
 }
 
 function populateDefaults(meta: EntityMetadata, cyclicEntities: string[] = []): any {
-    const defaultEntity = {
-        id: '0'
-    };
+    const defaultEntity = {};
     try {
         if (meta.columns) {
             meta.columns.forEach(column => {

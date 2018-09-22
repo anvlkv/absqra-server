@@ -29,5 +29,5 @@ export class SequenceResponse extends Base {
     @JoinTable()
     stepResponses: StepResponse[];
     @RelationId((sequenceResponse: SequenceResponse) => sequenceResponse.stepResponses)
-    stepResponsesIds?: number[];
+    stepResponsesIds?: string[];
 }

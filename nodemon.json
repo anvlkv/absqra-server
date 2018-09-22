@@ -3,5 +3,6 @@
   "ext": "ts",
   "ignore": ["src/**/index.ts", "src/client/**/*.*", "lib/**/*.*"],
   "exec": "npm run start",
-  "killOthers": true
+  "killOthers": true,
+  "delay":1000
 }

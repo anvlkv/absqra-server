@@ -4,8 +4,8 @@ import {
 } from 'typeorm';
 
 export abstract class Base {
-    @PrimaryGeneratedColumn()
-    id?: number;
+    @PrimaryGeneratedColumn('uuid')
+    id?: string;
 
     @CreateDateColumn({type: 'timestamp with time zone'})
     createdDate?: Date;

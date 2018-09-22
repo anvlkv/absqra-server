@@ -8,3 +8,7 @@ REVOKE CONNECT ON DATABASE :datname FROM public;
 DROP DATABASE :datname;
 
 CREATE DATABASE :datname OWNER=:username;
+
+\c :datname;
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

@@ -19,6 +19,7 @@ export class ViewRouter {
     }
 
     private registerViewExecutableQuestion() {
+        const localName = 'executableQuestion'
         const middlewear = async (ctx, next) => {
 
             const question = await getConnection()
@@ -28,17 +29,15 @@ export class ViewRouter {
             .leftJoinAndSelect('question.formatConstraints', 'formatConstraints')
             .leftJoinAndSelect('question.questionAssets', 'questionAssets')
             .leftJoinAndSelect('question.responseAssets', 'responseAssets')
-            .where('question.id = :id', { id: ctx.params['questionId'] })
+            .where('question.id = :id', { id: ctx.params[`${localName}Id`] })
             .getOne();
-
-            console.log(question);
 
             ctx.body = question;
         };
 
-        Object.defineProperty(middlewear, 'name', {value: 'question', writable: false});
+        Object.defineProperty(middlewear, 'name', {value: localName, writable: false});
 
-        this.router.get('viewExecutableQuestion', `${this.prefix}/question-exec/:questionId`, middlewear)
+        this.router.get('viewExecutableQuestion', `${this.prefix}/question-exec/:${localName}Id`, middlewear)
     }
 
 }

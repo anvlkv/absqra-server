@@ -28,8 +28,7 @@ console.time('Connected to PostgresSQL instance');
 
 (async () => {
     let app = new Koa();
-    const connection = await createConnection()
-    .catch(e => console.log('TypeORM connection error: ', e));
+    const connection = await createConnection();
 
     console.timeEnd('Connected to PostgresSQL instance');
 

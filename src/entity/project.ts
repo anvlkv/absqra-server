@@ -34,7 +34,7 @@ export class Project extends Base {
     @JoinTable()
     respondentsLists: RespondentsList[];
     @RelationId((project: Project) => project.respondentsLists)
-    respondentsListsIds?: number[];
+    respondentsListsIds?: string[];
 
 
 
@@ -44,6 +44,6 @@ export class Project extends Base {
     @JoinTable()
     sequenceResponses: SequenceResponse[];
     @RelationId((project: Project) => project.sequenceResponses)
-    sequenceResponsesIds?: number[];
+    sequenceResponsesIds?: string[];
 
 }

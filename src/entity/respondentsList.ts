@@ -11,5 +11,5 @@ export class RespondentsList extends Base {
     @JoinTable()
     respondents: Respondent[];
     @RelationId((respondent: RespondentsList) => respondent.respondents)
-    respondentsIds?: number[];
+    respondentsIds?: string[];
 }

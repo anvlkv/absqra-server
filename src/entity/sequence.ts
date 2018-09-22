@@ -28,7 +28,7 @@ export class Sequence extends Base {
     steps?: Step[];
 
     @RelationId((sequence: Sequence) => sequence.steps)
-    stepIds?: number[];
+    stepIds?: string[];
 
     @ManyToMany(type => Step, step => step.sequenceReference)
     referencedBySteps?: Sequence[];

@@ -32,7 +32,7 @@ export function exportRoutes(router: Router, name: string, absolutePathPrefix = 
 
     fs.writeFile(`lib/router/${name}.ts`, fileContent, function(err) {
         if (err) {
-            return console.error(err);
+            console.error(err);
         }
         else {
             console.timeEnd(msg);
