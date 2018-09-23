@@ -22,5 +22,6 @@ export * from './enums/formatConstraint.enums';
 export * from './enums/item.enums';
 export * from './enums/sequence.enums';
 export * from './enums/step.enums';
+export * from './enums/visualizationTypes.enums';
 export * from './question/entity';
 export * from './question/transform';

@@ -7,6 +7,7 @@ import { ResponseAsset } from '../responseAsset';
 import { QuestionContentAsset } from '../questionContentAsset';
 import { enumerableColumnProperties } from '../../util/helpers';
 import { QuestionTransformer } from './transform';
+import { VisualizationTypes } from '../enums/visualizationTypes.enums';
 
 
 const rules = new QuestionTransformer().rules;
@@ -30,8 +31,6 @@ export class Question extends Base {
     contentAsset: QuestionContentAsset;
     @RelationId((question: Question) => question.contentAsset)
     contentAssetId?: number;
-
-
 
     @Column({...enumerableColumnProperties, default: QuantityOrder.NONE})
     offers: QuantityOrder;
@@ -66,15 +65,17 @@ export class Question extends Base {
     responseAssetsIds?: string[];
 
 
-    visualization?: string;
+    visualization?: VisualizationTypes;
     @AfterLoad()
     private async determineClientComponent?(next) {
         const question = this;
-        question.visualization = await new Promise<string>((resolve) => {
+        question.visualization = await new Promise<VisualizationTypes>((resolve) => {
             rules.execute(question, (d) => {
-                resolve(d.result);
+                resolve(<VisualizationTypes>d.result);
             });
         });
         return question;
     }
+
+
 }

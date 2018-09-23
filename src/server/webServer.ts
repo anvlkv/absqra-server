@@ -12,9 +12,9 @@ import { logger, xResponseTime } from '../util/helpers';
 import { myCorsOptions } from './main';
 import { exportRoutes } from '../util/exportRoutes';
 import { Subject } from 'rxjs';
-import { debounceTime, delay } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 
-const clientRoot = 'src/client';
+const clientRoot = 'src/client/dist';
 
 export function startWebServer() {
     const webServerApp = websockify(new Koa());
