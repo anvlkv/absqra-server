@@ -27,3 +27,7 @@ export abstract class Base {
         }
     }
 }
+
+export interface IEntityBase extends Base {
+    [prop: string]: any;
+}

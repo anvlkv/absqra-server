@@ -11,7 +11,7 @@ export class AssetBase extends OrderableBase {
     @Column({...enumerableColumnProperties, default: AssetContentTypes.TEXT})
     contentType?: AssetContentTypes;
 
-    @Column({type: 'char', length: 2000, nullable: true})
+    @Column({type: 'text', nullable: true})
     content?: string;
 
     isGenerated?: boolean;

@@ -18,27 +18,12 @@ export function logger(name) {
     };
 }
 
-export function trimObject(obj) {
-    if (!obj) {
-        return;
-    }
+export const enumerableColumnProperties: ColumnOptions = {type: 'varchar', length: 32};
 
-    for (const k of Object.keys(obj)) {
-        if (typeof obj[k] === 'string') {
-            obj[k] = <String>(obj[k]).trim();
-        }
-        else if (typeof obj[k] === 'object') {
-            obj[k] = trimObject(obj[k]);
-        }
-    }
-    return obj;
+export function capitalizeFirstLetter (string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export function trimmer() {
-    return async (ctx, next) => {
-        await next();
-        ctx.body = trimObject(ctx.body);
-    };
+export function lowerFistLetter (string) {
+    return string.charAt(0).toLowerCase() + string.slice(1);
 }
-
-export const enumerableColumnProperties: ColumnOptions = {type: 'char', length: 32};

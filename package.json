@@ -5,8 +5,8 @@
    "main": "build/server/main.js",
    "types": "lib/types",
    "scripts": {
-      "test": "test",
-      "start": "npm run generate-barrels && rm -rf lib/types && tsc && ts-node $NODE_DEBUG_OPTION src/server/main.ts",
+      "test": "jest",
+      "start": "npm run generate-barrels && rm -rf lib/types && tsc && ts-node $NODE_DEBUG_OPTION src/main.ts",
       "build": "tsc --verbose",
       "build:watch": "nodemon --config nodemon.json",
       "restart:db": "psql -f sqlScripts/restart.sql -v datname=\"interveydev\" -v username=\"interveyapi\" -v datnameQ=\"'interveyapi'\"",
@@ -26,10 +26,12 @@
    "bugs": {
       "url": "https://github.com/anvlkv/absqra-server/issues"
    },
+   "jest": {
+      "testEnvironment": "node"
+   },
    "homepage": "https://github.com/anvlkv/absqra-server#readme",
    "dependencies": {
       "@koa/cors": "^2.2.2",
-      "co-body": "^5.2.0",
       "fast-json-patch": "^2.0.7",
       "fs": "0.0.1-security",
       "http": "0.0.0",
@@ -53,7 +55,7 @@
       "typeorm": "^0.2.7"
    },
    "devDependencies": {
-      "@types/jasmine": "2.5.38",
+      "@types/jest": "^23.3.5",
       "@types/json-patch": "0.0.30",
       "@types/koa": "^2.0.46",
       "@types/koa-router": "^7.0.32",
@@ -68,14 +70,7 @@
       "better-console": "^1.0.1",
       "concurrently": "^3.6.1",
       "debug": "^3.2.5",
-      "jasmine-core": "~2.5.2",
-      "jasmine-spec-reporter": "~3.2.0",
-      "karma": "^3.0.0",
-      "karma-chrome-launcher": "~2.0.0",
-      "karma-cli": "~1.0.1",
-      "karma-coverage-istanbul-reporter": "^0.2.0",
-      "karma-jasmine": "^1.1.2",
-      "karma-jasmine-html-reporter": "^0.2.2",
+      "jest": "^23.6.0",
       "ts-node": "^7.0.1",
       "tslint": "^5.11.0",
       "typescript": "2.7.2",

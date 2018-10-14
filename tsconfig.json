@@ -12,7 +12,13 @@
       "experimentalDecorators": true,
       "sourceMap": true,
       "declaration": true,
-      "declarationDir": "lib/types"
+      "declarationDir": "lib/types",
+      "typeRoots": [
+         "node_modules/@types"
+      ],
+      "types": [
+         "koa-body"
+      ]
    },
    "exclude": [
       "lib",

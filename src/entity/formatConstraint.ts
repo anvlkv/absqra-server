@@ -14,7 +14,7 @@ export class FormatConstraint extends Base {
     @Column({...enumerableColumnProperties, default: META_VALUE_ValidationTypes.EXISTS})
     validationSubType: TYPE_ValidationTypes | VALUE_ValidationTypes | META_VALUE_ValidationTypes;
 
-    @Column({type: 'char', length: 500, nullable: true})
+    @Column({type: 'varchar', length: 500, nullable: true})
     stringConstraint?: string;
 
     @Column({type: 'numeric', nullable: true})

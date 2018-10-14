@@ -6,10 +6,10 @@ import { enumerableColumnProperties } from '../util/helpers';
 
 @Entity()
 export class SequenceHeader extends Base {
-    @Column({type: 'char', length: 256, default: 'new sequence', nullable: false})
+    @Column({type: 'varchar', length: 500, default: 'new sequence', nullable: false})
     name: string;
 
-    @Column({type: 'char', length: 2000, nullable: true})
+    @Column({type: 'text', nullable: true})
     description?: string;
 
     @Column({...enumerableColumnProperties, default: SequenceLifeCycleTypes.ONE_ONE})

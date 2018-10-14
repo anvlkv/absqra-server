@@ -3,6 +3,7 @@ import { Entity } from 'typeorm/decorator/entity/Entity';
 import { Step } from './step';
 import { Base } from './base';
 import { SequenceHeader } from './sequenceHeader';
+import { Project } from './project';
 
 
 @Entity({
@@ -32,4 +33,10 @@ export class Sequence extends Base {
 
     @ManyToMany(type => Step, step => step.sequenceReference)
     referencedBySteps?: Sequence[];
+
+    @OneToOne(type => Project, project => project.topSequence)
+    project?: Project;
+
+    @RelationId((sequence: Sequence) => sequence.project)
+    projectId?: Project;
 }

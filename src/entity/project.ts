@@ -1,8 +1,8 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, RelationId } from 'typeorm';
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, RelationId } from 'typeorm';
 import { Base } from './base';
 import { Sequence } from './sequence';
 import { RespondentsList } from './respondentsList';
-import { SequenceResponse } from './response';
+import { SequenceResponse } from './sequenceResponse';
 
 @Entity({
     orderBy: {
@@ -10,19 +10,20 @@ import { SequenceResponse } from './response';
     }
 })
 export class Project extends Base {
-    @Column({type: 'char', length: 256, default: 'new project'})
+    @Column({type: 'varchar', length: 500, default: 'new project'})
     name?: string;
 
-    @Column({type: 'char', length: 2000, nullable: true})
+    @Column({type: 'text', nullable: true})
     description?: string;
 
 
 
-    @ManyToOne(type => Sequence, {
-        cascade: true
+    @OneToOne(type => Sequence, sequence => sequence.project, {
+        cascade: true,
+        eager: true
     })
     @JoinColumn()
-    topSequence: Sequence;
+    topSequence?: Sequence;
     @RelationId((project: Project) => project.topSequence)
     topSequenceId?: number;
 

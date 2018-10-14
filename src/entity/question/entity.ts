@@ -7,7 +7,7 @@ import { ResponseAsset } from '../responseAsset';
 import { QuestionContentAsset } from '../questionContentAsset';
 import { enumerableColumnProperties } from '../../util/helpers';
 import { QuestionTransformer } from './transform';
-import { VisualizationTypes } from '../enums/visualizationTypes.enums';
+import { QuestionPresentationTypes } from '../enums/questionPresentationTypes.enums';
 
 
 const rules = new QuestionTransformer().rules;
@@ -15,10 +15,10 @@ const rules = new QuestionTransformer().rules;
 @Entity()
 export class Question extends Base {
 
-    @Column({type: 'char', length: 256, default: 'new question'})
+    @Column({type: 'varchar', length: 500, default: 'new question'})
     name?: string;
 
-    @Column({type: 'char', length: 2000, nullable: true})
+    @Column({type: 'text', nullable: true})
     description?: string;
 
 
@@ -65,15 +65,19 @@ export class Question extends Base {
     responseAssetsIds?: string[];
 
 
-    visualization?: VisualizationTypes;
+    presentationType?: QuestionPresentationTypes;
     @AfterLoad()
-    private async determineClientComponent?(next) {
+    private async determinePresentationType?(next) {
         const question = this;
-        question.visualization = await new Promise<VisualizationTypes>((resolve) => {
+        question.presentationType = await new Promise<QuestionPresentationTypes>((resolve) => {
             rules.execute(question, (d) => {
-                resolve(<VisualizationTypes>d.result);
+                if (typeof d.presentationType === 'boolean') {
+                    throw new Error(`no presentation type found for question [${question.id}]`)
+                }
+                resolve(<QuestionPresentationTypes>d.presentationType);
             });
         });
+
         return question;
     }
 

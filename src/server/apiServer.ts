@@ -8,12 +8,12 @@ import * as websockify from 'koa-websocket';
 
 import { createConnection } from 'typeorm';
 import { environment } from '../environments/environment';
-import { CRUDRouterManager } from './crudRouterManager';
-import { Project, Question, Sequence, Step, RespondentsList, SequenceResponse} from '../entity';
-import { logger, trimmer, xResponseTime } from '../util/helpers';
-import { startWebServer } from './webServer';
+import { CRUDRouterManager } from '../api/crudRouterManager';
+import { Project, Question, Sequence, RespondentsList, SequenceResponse} from '../entity';
+import { logger, xResponseTime } from '../util/helpers';
 import { exportRoutes } from '../util/exportRoutes';
-import { ViewRouter } from './viewRouter';
+import { RespondentRouter } from '../api/respondentRouter';
+import { DataOpRouterManager } from '../api/dataOpRouterManager';
 
 
 const port = environment.apiPort;
@@ -26,7 +26,7 @@ export const myCorsOptions: cors.Options = {
 console.time('App listening on port ' + port);
 console.time('Connected to PostgresSQL instance');
 
-(async () => {
+export async function startApiServer() {
     let app = new Koa();
     const connection = await createConnection();
 
@@ -52,7 +52,6 @@ console.time('Connected to PostgresSQL instance');
     app.keys = environment.secret;
 
     app.use(session(CONFIG, app));
-    app.use(trimmer());
     app.use(cors(myCorsOptions));
 
 
@@ -73,6 +72,7 @@ console.time('Connected to PostgresSQL instance');
 
     app.use(helmet());
 
+    app.use(bodyParser());
 
     const crudRouterManager = new CRUDRouterManager({
         Project,
@@ -80,52 +80,56 @@ console.time('Connected to PostgresSQL instance');
         Question,
         SequenceResponse,
         RespondentsList
-    }, 'crud');
-
-
-
+    }, ['GET', 'POST', 'PATCH', 'DELETE'], ['GET', 'POST'], 'crud');
     const crudRouter = crudRouterManager.router;
-
     if (!environment.production) {
         exportRoutes(crudRouterManager.router, 'CRUDRouter');
     }
-
-    app.use(bodyParser())
-        .use(crudRouter.routes())
+    app.use(crudRouter.routes())
         .use(crudRouter.allowedMethods());
 
-    const viewRouterManager = new ViewRouter();
-    const viewRouter = viewRouterManager.router;
-
+    const viewRouter = new RespondentRouter();
     app.use(viewRouter.routes())
         .use(viewRouter.allowedMethods());
 
+    const dataOpRouterManager = new DataOpRouterManager({
+        Project,
+        Sequence,
+        Question,
+        SequenceResponse,
+        RespondentsList
+    }, ['POST'], ['POST'], 'data-op');
+    const dataOpRouter = dataOpRouterManager.router;
 
+    if (!environment.production) {
+        exportRoutes(dataOpRouterManager.router, 'DataOpRouter');
+    }
+
+    app.use(dataOpRouter.routes())
+        .use(dataOpRouter.allowedMethods());
+
+
+
+    // keep at the end of stack...
     const deadEnd = new Router();
-
     deadEnd.register('**', ['GET', 'POST', 'PATCH', 'DELETE'], async (ctx, next) => {
         await next();
         if (!ctx.body) {
             ctx.throw(404);
+            if (!environment.production) {
+                console.error(`404: Not found [${ctx.req.url}]`)
+            }
         }
     });
-
     app.use(deadEnd.routes())
         .use(deadEnd.allowedMethods());
 
     if (!environment.production) {
-        exportRoutes(viewRouterManager.router, 'ViewRouter');
+        exportRoutes(viewRouter, 'RespondentRouter');
     }
     app.listen(port, () => {
         console.timeEnd('App listening on port ' + port);
-
-        if (environment.port) {
-            startWebServer();
-        }
-        else {
-            console.warn(`Use client at ${environment.clientPort} or specify environment.port`);
-        }
     });
-})();
+}
 
 process.on('SIGINT', () => { console.log('doei doei!'); process.exit(); });

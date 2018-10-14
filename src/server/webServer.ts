@@ -9,12 +9,12 @@ import * as Router from 'koa-router';
 
 import { environment } from '../environments/environment';
 import { logger, xResponseTime } from '../util/helpers';
-import { myCorsOptions } from './main';
+import { myCorsOptions } from './apiServer';
 import { exportRoutes } from '../util/exportRoutes';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
-const clientRoot = 'src/client/dist';
+const clientRoot = 'src/client';
 
 export function startWebServer() {
     const webServerApp = websockify(new Koa());
