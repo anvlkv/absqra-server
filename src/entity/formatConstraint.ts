@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
 import { Base } from './base';
 import { META_VALUE_ValidationTypes, TYPE_ValidationTypes, ValidationTypes, VALUE_ValidationTypes } from './enums/formatConstraint.enums';
 import { Question } from './question/entity';
@@ -25,4 +25,6 @@ export class FormatConstraint extends Base {
 
     @ManyToOne(type => Question, question => question.formatConstraints)
     question: Question;
+    @RelationId((fc: FormatConstraint) => fc.question)
+    questionId?: string;
 }

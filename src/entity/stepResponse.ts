@@ -11,7 +11,7 @@ export class StepResponse extends Base {
     @JoinColumn()
     step?: Step;
     @RelationId((stepResponse: StepResponse) => stepResponse.step)
-    stepId?: number;
+    stepId?: string;
 
     @ManyToOne(type => SequenceResponse, response => response.stepResponses)
     sequenceResponse?: SequenceResponse;

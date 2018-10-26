@@ -9,11 +9,12 @@ import * as websockify from 'koa-websocket';
 import { createConnection } from 'typeorm';
 import { environment } from '../environments/environment';
 import { CRUDRouterManager } from '../api/crudRouterManager';
-import { Project, Question, Sequence, RespondentsList, SequenceResponse} from '../entity';
+import { Project, Question, Sequence, RespondentsList, SequenceResponse, Step } from '../entity';
 import { logger, xResponseTime } from '../util/helpers';
 import { exportRoutes } from '../util/exportRoutes';
 import { RespondentRouter } from '../api/respondentRouter';
 import { DataOpRouterManager } from '../api/dataOpRouterManager';
+import { DesignerRouter } from '../api/designerRouter';
 
 
 const port = environment.apiPort;
@@ -33,7 +34,7 @@ export async function startApiServer() {
     console.timeEnd('Connected to PostgresSQL instance');
 
 
-    const CONFIG = {
+    const SESSION_CONFIG = {
         key: 'intervey:session', /** (string) cookie key (default is koa:sess) */
         /** (number || 'session') maxAge in ms (default is 1 days) */
         /** 'session' will result in a cookie that expires when session/browser is closed */
@@ -51,7 +52,7 @@ export async function startApiServer() {
 
     app.keys = environment.secret;
 
-    app.use(session(CONFIG, app));
+    app.use(session(SESSION_CONFIG, app));
     app.use(cors(myCorsOptions));
 
 
@@ -77,20 +78,22 @@ export async function startApiServer() {
     const crudRouterManager = new CRUDRouterManager({
         Project,
         Sequence,
+        Step,
         Question,
         SequenceResponse,
         RespondentsList
     }, ['GET', 'POST', 'PATCH', 'DELETE'], ['GET', 'POST'], 'crud');
     const crudRouter = crudRouterManager.router;
-    if (!environment.production) {
-        exportRoutes(crudRouterManager.router, 'CRUDRouter');
-    }
     app.use(crudRouter.routes())
         .use(crudRouter.allowedMethods());
 
-    const viewRouter = new RespondentRouter();
-    app.use(viewRouter.routes())
-        .use(viewRouter.allowedMethods());
+    const respondentRouter = new RespondentRouter();
+    app.use(respondentRouter.routes())
+        .use(respondentRouter.allowedMethods());
+
+    const designerRouter = new DesignerRouter();
+    app.use(designerRouter.routes())
+    .use(designerRouter.allowedMethods());
 
     const dataOpRouterManager = new DataOpRouterManager({
         Project,
@@ -98,12 +101,9 @@ export async function startApiServer() {
         Question,
         SequenceResponse,
         RespondentsList
-    }, ['POST'], ['POST'], 'data-op');
+    }, ['POST', 'GET'], [], 'data-op');
     const dataOpRouter = dataOpRouterManager.router;
 
-    if (!environment.production) {
-        exportRoutes(dataOpRouterManager.router, 'DataOpRouter');
-    }
 
     app.use(dataOpRouter.routes())
         .use(dataOpRouter.allowedMethods());
@@ -125,7 +125,10 @@ export async function startApiServer() {
         .use(deadEnd.allowedMethods());
 
     if (!environment.production) {
-        exportRoutes(viewRouter, 'RespondentRouter');
+        exportRoutes(crudRouterManager.router, 'CRUDRouter');
+        exportRoutes(dataOpRouterManager.router, 'DataOpRouter');
+        exportRoutes(respondentRouter, 'RespondentRouter');
+        exportRoutes(designerRouter, 'DesignerRouter');
     }
     app.listen(port, () => {
         console.timeEnd('App listening on port ' + port);

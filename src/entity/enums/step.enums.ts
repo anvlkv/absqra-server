@@ -2,5 +2,6 @@ export enum StepTypes {
     QUESTION_REF = 'question_reference',
     TASK_REF = 'task_reference',
     LOGICAL_ITEM = 'logical_item',
-    SEQUENCE_REF = 'sequence_reference'
+    SEQUENCE_REF = 'sequence_reference',
+    ASSET_REF = 'asset_reference'
 }

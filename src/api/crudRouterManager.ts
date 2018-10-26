@@ -1,18 +1,23 @@
 import { RouterManagerBase } from './RouterManagerBase';
-import { EntityMetadata, FindManyOptions } from 'typeorm';
+import { EntityMetadata, FindManyOptions, FindOneOptions } from 'typeorm';
 import { IMiddleware } from 'koa-router';
 import { applyPatch, applyReducer, Operation, validate } from 'fast-json-patch';
 import * as pluralize from 'pluralize';
 
 export class CRUDRouterManager extends RouterManagerBase {
-    get commandParamName(): string {
-        return;
-    }
+    get commandParamName(): string { return; }
 
     generateEntityMiddlewear(Repo, Entity, name, localPostfix): IMiddleware {
         return async (ctx, next) => {
             try {
                 const id = ctx.params[`${name}Id`];
+
+                // let parentId: string;
+                // const findOneOptions: FindOneOptions = {};
+                // if (parent) {
+                //     parentId = parent ? ctx.params[`${parent}Id`] : null;
+                //     findOneOptions.where = `"${parent}Id"='${parentId}'`
+                // }
 
                 if (id === 'default') {
                     ctx.body = this.populateDefaults(Repo.metadata);
@@ -33,8 +38,14 @@ export class CRUDRouterManager extends RouterManagerBase {
                             entry[key] = ctx.request.body[key];
                         }
 
-                        const saveResult = await Repo.save(entry);
-                        ctx.body = await Repo.findOne(id);
+                        // if (parent) {
+                        //     // const saveResult =
+                        //     console.log(parent);
+                        // }
+                        // else {
+                            await Repo.save(entry);
+                            ctx.body = await Repo.findOne(id);
+                        // }
                         break;
                     }
                     case 'PATCH': {

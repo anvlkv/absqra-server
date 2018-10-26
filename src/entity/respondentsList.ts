@@ -8,7 +8,17 @@ export class RespondentsList extends Base {
         cascade: true,
         eager: true
     })
-    @JoinTable()
+    @JoinTable({
+        name: 'respondentsList_respondents',
+        joinColumn: {
+            name: 'respondentsList',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'respondent',
+            referencedColumnName: 'id'
+        }
+    })
     respondents: Respondent[];
     @RelationId((respondent: RespondentsList) => respondent.respondents)
     respondentsIds?: string[];

@@ -1,4 +1,4 @@
-import { Column, Entity, JoinTable, ManyToOne, RelationId } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToOne, OneToMany, RelationId } from 'typeorm';
 import { Sequence } from './sequence';
 import { StepTypes } from './enums/step.enums';
 import { Question } from './question/entity';
@@ -20,45 +20,103 @@ export class Step extends OrderableBase {
     type?: StepTypes;
 
     @ManyToOne(type => Sequence, sequence => sequence.referencedBySteps, {
-        cascade: true
+        cascade: true,
+        eager: true
     })
-    @JoinTable()
+    @JoinTable({
+        name: 'step_sequenceReference',
+        joinColumn: {
+            name: 'step',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'sequenceReference',
+            referencedColumnName: 'id'
+        }
+    })
     sequenceReference?: Sequence;
     @RelationId((step: Step) => step.sequenceReference)
-    sequenceReferenceId?: number;
+    sequenceReferenceId?: string;
 
     @ManyToOne(type => Question, {
-        cascade: true
+        cascade: true,
+        eager: true
     })
-    @JoinTable()
+    @JoinTable({
+        name: 'step_questionReference',
+        joinColumn: {
+            name: 'step',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'questionReference',
+            referencedColumnName: 'id'
+        }
+    })
     questionReference?: Question;
     @RelationId((step: Step) => step.questionReference)
-    questionReferenceId?: number;
+    questionReferenceId?: string;
 
     @ManyToOne(type => Task, {
-        cascade: true
+        cascade: true,
+        eager: true
     })
-    @JoinTable()
+    @JoinTable({
+        name: 'step_taskReference',
+        joinColumn: {
+            name: 'step',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'taskReference',
+            referencedColumnName: 'id'
+        }
+    })
     taskReference?: Task;
     @RelationId((step: Step) => step.taskReference)
-    taskReferenceId?: number;
+    taskReferenceId?: string;
 
     @ManyToOne(type => Logic, {
-        cascade: true
+        cascade: true,
+        eager: true
     })
-    @JoinTable()
+    @JoinTable({
+        name: 'step_logicReference',
+        joinColumn: {
+            name: 'step',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'logicReference',
+            referencedColumnName: 'id'
+        }
+    })
     logicReference?: Logic;
     @RelationId((step: Step) => step.logicReference)
-    logicReferenceId?: number;
+    logicReferenceId?: string;
 
     @ManyToOne(type => StepAsset, {
-        cascade: true
+        cascade: true,
+        eager: true
     })
-    @JoinTable()
+    @JoinTable({
+        name: 'step_assetReference',
+        joinColumn: {
+            name: 'step',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'assetReference',
+            referencedColumnName: 'id'
+        }
+    })
     assetReference?: StepAsset;
     @RelationId((step: Step) => step.assetReference)
-    assetReferenceId?: number;
+    assetReferenceId?: string;
 
     @ManyToOne(type => Sequence, sequence => sequence.steps)
     sequence?: Sequence;
+    @RelationId((step: Step) => step.sequence)
+    sequenceId?: string;
+
 }

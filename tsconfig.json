@@ -14,7 +14,8 @@
       "declaration": true,
       "declarationDir": "lib/types",
       "typeRoots": [
-         "node_modules/@types"
+         "node_modules/@types",
+         "src/typings"
       ],
       "types": [
          "koa-body"

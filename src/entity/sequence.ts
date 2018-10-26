@@ -25,7 +25,17 @@ export class Sequence extends Base {
     @OneToMany(type => Step, step => step.sequence, {
         cascade: true
     })
-    @JoinTable()
+    @JoinTable({
+        name: 'sequence_steps',
+        joinColumn: {
+            name: 'sequence',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'step',
+            referencedColumnName: 'id'
+        }
+    })
     steps?: Step[];
 
     @RelationId((sequence: Sequence) => sequence.steps)

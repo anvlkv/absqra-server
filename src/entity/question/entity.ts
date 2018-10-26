@@ -27,7 +27,17 @@ export class Question extends Base {
         cascade: true,
         eager: true
     })
-    @JoinTable()
+    @JoinTable({
+        name: 'question_contentAsset',
+        joinColumn: {
+            name: 'question',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'contentAsset',
+            referencedColumnName: 'id'
+        }
+    })
     contentAsset: QuestionContentAsset;
     @RelationId((question: Question) => question.contentAsset)
     contentAssetId?: number;
@@ -41,7 +51,17 @@ export class Question extends Base {
     @OneToMany(type => FormatConstraint, fc => fc.question, {
         cascade: true
     })
-    @JoinTable()
+    @JoinTable({
+        name: 'question_formatConstraints',
+        joinColumn: {
+            name: 'question',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'formatConstraint',
+            referencedColumnName: 'id'
+        }
+    })
     formatConstraints?: FormatConstraint[];
     @RelationId((question: Question) => question.formatConstraints)
     formatConstraintsIds?: string[];
@@ -50,7 +70,17 @@ export class Question extends Base {
     @OneToMany(type => QuestionAsset, qa => qa.question, {
         cascade: true
     })
-    @JoinTable()
+    @JoinTable({
+        name: 'question_questionAssets',
+        joinColumn: {
+            name: 'question',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'questionAsset',
+            referencedColumnName: 'id'
+        }
+    })
     questionAssets?: QuestionAsset[];
     @RelationId((question: Question) => question.questionAssets)
     questionAssetsIds?: string[];
@@ -59,7 +89,17 @@ export class Question extends Base {
     @OneToMany(type => ResponseAsset, ra => ra.question, {
         cascade: true
     })
-    @JoinTable()
+    @JoinTable({
+        name: 'question_responseAsset',
+        joinColumn: {
+            name: 'question',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'responseAsset',
+            referencedColumnName: 'id'
+        }
+    })
     responseAssets?: ResponseAsset[];
     @RelationId((question: Question) => question.responseAssets)
     responseAssetsIds?: string[];

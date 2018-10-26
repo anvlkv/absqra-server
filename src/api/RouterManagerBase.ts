@@ -20,6 +20,7 @@ export abstract class RouterManagerBase {
     public readonly parentName: string;
 
     private _registeredEntities: string[];
+
     public get registeredEntities(): string[] {
         if (this.root) {
             return this.root.registeredEntities;
@@ -82,22 +83,27 @@ export abstract class RouterManagerBase {
         for (const entityName in entities) {
             this.registerEntity(entityName);
             this.registerRepo(entityName);
-        }
-
-        for (const entityName in entities) {
             this.registerRelations(entityName);
         }
     }
 
-    public addEntity(entity: Function) {
-        this.entities[entity.name] = entity;
-        this.registerEntity(entity.name);
-        this.addRepo(entity);
+    public addEntity(Entity: EntityBase, alias?: string, Parent?: EntityBase) {
+        if (alias && Parent) {
+            this.registerEntityAlias(alias, Parent, Entity)
+        }
+        else if (!alias && !Parent) {
+            this.entities[Entity.name] = Entity;
+            this.registerEntity(Entity.name);
+            this.addRepo(Entity);
+        }
+        else {
+            throw new Error('don\'t know what to do here');
+        }
     }
 
-    public addRepo(entity: Function) {
-        this.entities[entity.name] = entity;
-        this.registerRepo(entity.name);
+    public addRepo(Entity: Function) {
+        this.entities[Entity.name] = Entity;
+        this.registerRepo(Entity.name);
     }
 
     public registerEntity(entityName: string) {
@@ -115,6 +121,63 @@ export abstract class RouterManagerBase {
 
             this.registeredEntities.push(entityName);
         }
+    }
+
+    public registerEntityAlias(alias: string, Parent: EntityBase, Entity: EntityBase) {
+        let Repo: Repository<IEntityBase>;
+        if (!this.isEntityRegistered(alias)) {
+            try {
+                Repo = getConnection().getRepository(Entity);
+            } catch (e) {
+                console.error(e);
+                throw new Error(`${alias}: ${Entity.name} is not an Entity... or cannot get repo`);
+            }
+            this.registerAliasRouter(alias, Parent, Repo, Entity);
+
+            this.registeredEntities.push(alias);
+        }
+    }
+
+    public registerAliasRouter(aliasName: string, Parent: EntityBase, Repo: Repository<IEntityBase>, Entity: EntityBase) {
+        const Manager: any = this.constructor;
+        const parentName = lowerFistLetter(Parent.name);
+        const pluralizedParentName = pluralize(Parent.name);
+        const localPostfix = this.generateRouterNamePostfix(parentName);
+        const alias = {};
+        alias[aliasName] = Entity;
+
+
+
+        // new Repository()
+
+        //    constructor(
+        //         entities: {[name: string]: any },
+        //         public entityMethods: string[],
+        //         public repoMethods: string[],
+        //         public readonly routerPrefix = '',
+        //         public router = new Router(),
+        //         public routeNamePostfix = '',
+        //         public parentRepo: Repository<IEntityBase> = null,
+        //         public parentEntities = {},
+        //         public root: RouterManagerBase = null
+        //     ) {
+
+        // this.children.push(
+        //     new Manager(
+        //         alias,
+        //         this.entityMethods,
+        //         this.repoMethods,
+        //         `${this.routerPrefix}/${pluralizedParentName}/:${parentName}Id`,
+        //         this.router,
+        //         localPostfix,
+        //         Repo)
+        // )
+        // const name = lowerFistLetter(alias);
+        // const localPostfix = capitalizeFirstLetter(name);
+        // const middlewear = this.generateEntityMiddlewear(Repo, Entity, name, localPostfix, lowerFistLetter(parent));
+        // const suffix = this.commandParamName ?  `/:${this.commandParamName}` : '';
+        // Object.defineProperty(middlewear, 'name', {value: Entity.name, writable: false});
+        // this.router.register(`${this.routerPrefix}/${lowerFistLetter(parent)}/:${lowerFistLetter(parent)}Id/${name}${suffix}`, this.repoMethods, middlewear, {name: `entity${localPostfix}Of${capitalizeFirstLetter(parent)}`});
     }
 
     public registerRepo(entityName: string) {
@@ -149,31 +212,44 @@ export abstract class RouterManagerBase {
         this.registerRelationRouter(Repo, this.entities[entityName]);
     }
 
-    private registerRelationRouter(Repo: Repository<IEntityBase>, Entity: Function) {
+    private registerRelationRouter(Repo: Repository<IEntityBase>, Entity: EntityBase) {
         const name = lowerFistLetter(Entity.name);
         const localPostfix = this.generateRouterNamePostfix(name);
         const pluralizedName = pluralize(name);
+        const Manager: any = this.constructor;
 
         const relatedRoutesTask = Repo.metadata.relations.reduce((related, rel) => {
             const relationName = (<Function>rel.type).name;
-            if (!this.entities[relationName]) {
-                if (rel.isManyToOne || rel.isOneToOne) {
+            if (rel.isManyToOne || rel.isOneToOne) {
+                if (!this.entities[relationName]) {
                     related.entities[relationName] = rel.type;
                 }
-                else if (!rel.isOwning) {
-                    related.repos[relationName] = rel.type;
+                else if (rel.isOwning && rel.isOneToOne && typeof rel.type === 'function') {
+                    related.entityAs[rel.propertyName] = rel.type;
+                }
+                else {
+                    related.skipped[relationName] = rel.type;
                 }
             }
+            else if (!rel.isOwning) {
+                related.repos[relationName] = rel.type;
+            }
+            else {
+                related.skipped[relationName] = rel.type;
+            }
             return related
-        }, {repos: {}, entities: {}});
+        }, {repos: {}, entities: {}, entityAs: {}, skipped: {}});
 
 
         for (const entityName in relatedRoutesTask.entities) {
             this.addEntity(relatedRoutesTask.entities[entityName]);
         }
 
+        for (const entityName in relatedRoutesTask.entityAs) {
+            this.addEntity(relatedRoutesTask.entityAs[entityName], entityName, Entity);
+        }
+
         if (Object.keys(relatedRoutesTask.repos).length) {
-            const Manager: any = this.constructor;
             this.children.push(
                 new Manager(
                     relatedRoutesTask.repos,

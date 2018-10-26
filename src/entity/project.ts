@@ -25,14 +25,24 @@ export class Project extends Base {
     @JoinColumn()
     topSequence?: Sequence;
     @RelationId((project: Project) => project.topSequence)
-    topSequenceId?: number;
+    topSequenceId?: string;
 
 
 
     @ManyToMany(type => RespondentsList, {
         cascade: true
     })
-    @JoinTable()
+    @JoinTable({
+        name: 'project_respondentLists',
+        joinColumn: {
+            name: 'project',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'respondentList',
+            referencedColumnName: 'id'
+        }
+    })
     respondentsLists: RespondentsList[];
     @RelationId((project: Project) => project.respondentsLists)
     respondentsListsIds?: string[];
@@ -42,7 +52,17 @@ export class Project extends Base {
     @OneToMany(type => SequenceResponse, (response: SequenceResponse) => response.project, {
         cascade: true
     })
-    @JoinTable()
+    @JoinTable({
+        name: 'project_sequenceResponses',
+        joinColumn: {
+            name: 'project',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'sequenceResponse',
+            referencedColumnName: 'id'
+        }
+    })
     sequenceResponses: SequenceResponse[];
     @RelationId((project: Project) => project.sequenceResponses)
     sequenceResponsesIds?: string[];

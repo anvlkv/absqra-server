@@ -23,5 +23,6 @@ export * from './enums/item.enums';
 export * from './enums/questionPresentationTypes.enums';
 export * from './enums/sequence.enums';
 export * from './enums/step.enums';
+export * from './enums/task.enums';
 export * from './question/entity';
 export * from './question/transform';

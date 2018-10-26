@@ -4,7 +4,7 @@ import { OrderableBase } from './orderableBase';
 import { enumerableColumnProperties } from '../util/helpers';
 
 
-export class AssetBase extends OrderableBase {
+export abstract class AssetBase extends OrderableBase {
     @Column({...enumerableColumnProperties, default: AssetTypes.STATIC})
     assetType?: AssetTypes;
 
@@ -14,7 +14,9 @@ export class AssetBase extends OrderableBase {
     @Column({type: 'text', nullable: true})
     content?: string;
 
+    @Column({type: 'uuid', nullable: true})
+    sourceStepId?: string;
+
     isGenerated?: boolean;
-    origin?: number;
 }
 

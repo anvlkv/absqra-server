@@ -5,7 +5,11 @@ import { Sequence } from './sequence';
 import { StepResponse } from './stepResponse';
 import { Respondent } from './respondent';
 
-@Entity()
+@Entity({
+    orderBy: {
+        updatedDate: 'DESC'
+    }
+})
 export class SequenceResponse extends Base {
 
     @ManyToOne(type => Project, project => project.sequenceResponses)
@@ -26,7 +30,17 @@ export class SequenceResponse extends Base {
     @OneToMany(type => StepResponse, stepResponse => stepResponse.sequenceResponse, {
         cascade: true
     })
-    @JoinTable()
+    @JoinTable({
+        name: 'sequenceResponse_stepResponses',
+        joinColumn: {
+            name: 'sequenceResponse',
+            referencedColumnName: 'id'
+        },
+        inverseJoinColumn: {
+            name: 'stepResponse',
+            referencedColumnName: 'id'
+        }
+    })
     stepResponses?: StepResponse[];
     @RelationId((sequenceResponse: SequenceResponse) => sequenceResponse.stepResponses)
     stepResponsesIds?: string[];

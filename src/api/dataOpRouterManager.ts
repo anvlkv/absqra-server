@@ -4,11 +4,14 @@ import { EntityBase, RouterManagerBase } from './RouterManagerBase';
 import { IEntityBase } from '../entity';
 
 export enum DataOperationTypes {
-    CLONE = 'clone'
+    CLONE = 'clone',
+    DOWNLOAD = 'download'
 }
 
 export class DataOpRouterManager extends RouterManagerBase {
     get commandParamName() { return 'operationType'; }
+
+
 
     private async cloneEntity(Repo: Repository<IEntityBase>, Entity: EntityBase, sourceEntryPromise: Promise<IEntityBase>, deep = false): Promise<IEntityBase> {
         const sourceEntry = await sourceEntryPromise;
@@ -77,10 +80,26 @@ export class DataOpRouterManager extends RouterManagerBase {
             try {
                 const operationType: DataOperationTypes = ctx.params['operationType'];
                 const sourceEntryId = ctx.params[`${name}Id`];
-                const sourceEntry = Repo.findOne(sourceEntryId);
                 switch (operationType) {
                     case DataOperationTypes.CLONE: {
+                        const sourceEntry = Repo.findOne(sourceEntryId);
                         ctx.body = await this.cloneEntity(Repo, Entity, sourceEntry);
+                        break;
+                    }
+                    case DataOperationTypes.DOWNLOAD: {
+                        // const relationsReducer = (parent = '', alias = '') => ((acc, rel, at, all) => {
+                        //     const relationPath = `${parent ? parent + `.` : ''}${rel.propertyPath}`;
+                        //     if (rel.isOwning && !acc.find(r => relationPath === r)) {
+                        //         acc.push(relationPath);
+                        //         acc = rel.entityMetadata.relations.reduce(relationsReducer(rel.propertyPath), acc);
+                        //     }
+                        //     return acc;
+                        // });
+                        // const relations = Repo.metadata.relations.reduce(relationsReducer(), <string[]>[]);
+                        const sourceEntry = Repo.findOne(sourceEntryId);
+                        ctx.set('ContentType', 'application/json');
+                        ctx.attachment(`${name}_${sourceEntryId}.json`);
+                        ctx.body = await sourceEntry;
                         break;
                     }
                 }
