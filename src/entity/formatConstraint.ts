@@ -3,6 +3,7 @@ import { Base } from './base';
 import { META_VALUE_ValidationTypes, TYPE_ValidationTypes, ValidationTypes, VALUE_ValidationTypes } from './enums/formatConstraint.enums';
 import { Question } from './question/entity';
 import { enumerableColumnProperties } from '../util/helpers';
+import { Logic } from './logic';
 
 
 @Entity()
@@ -27,4 +28,9 @@ export class FormatConstraint extends Base {
     question: Question;
     @RelationId((fc: FormatConstraint) => fc.question)
     questionId?: string;
+
+    @ManyToOne(type => Logic, logic => logic.formatConstraints)
+    logic: Question;
+    @RelationId((fc: FormatConstraint) => fc.question)
+    logicId?: string;
 }

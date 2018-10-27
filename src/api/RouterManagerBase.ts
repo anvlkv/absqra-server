@@ -224,14 +224,14 @@ export abstract class RouterManagerBase {
                 if (!this.entities[relationName]) {
                     related.entities[relationName] = rel.type;
                 }
-                else if (rel.isOwning && rel.isOneToOne && typeof rel.type === 'function') {
-                    related.entityAs[rel.propertyName] = rel.type;
-                }
+                // else if (rel.isOwning && rel.isOneToOne && typeof rel.type === 'function') {
+                //     related.entityAs[rel.propertyName] = rel.type;
+                // }
                 else {
                     related.skipped[relationName] = rel.type;
                 }
             }
-            else if (!rel.isOwning) {
+            else if ((!rel.isOwning && !rel.isTreeChildren) || (rel.isTreeChildren && !this.isEntityRegistered(relationName))) {
                 related.repos[relationName] = rel.type;
             }
             else {

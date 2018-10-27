@@ -20,6 +20,7 @@ export * from './task';
 export * from './enums/asset.enums';
 export * from './enums/formatConstraint.enums';
 export * from './enums/item.enums';
+export * from './enums/logic.enums';
 export * from './enums/questionPresentationTypes.enums';
 export * from './enums/sequence.enums';
 export * from './enums/step.enums';

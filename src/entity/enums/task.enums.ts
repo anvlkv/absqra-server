@@ -1,4 +1,4 @@
-export enum TaskExecutor {
+export enum TaskExecutorType {
     CLIENT = 'client',
     SERVER = 'server'
 }

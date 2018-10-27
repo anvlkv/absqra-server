@@ -9,7 +9,7 @@ import * as websockify from 'koa-websocket';
 import { createConnection } from 'typeorm';
 import { environment } from '../environments/environment';
 import { CRUDRouterManager } from '../api/crudRouterManager';
-import { Project, Question, Sequence, RespondentsList, SequenceResponse, Step } from '../entity';
+import { Project, Question, Sequence, RespondentsList, SequenceResponse, Step, Task, Logic } from '../entity';
 import { logger, xResponseTime } from '../util/helpers';
 import { exportRoutes } from '../util/exportRoutes';
 import { RespondentRouter } from '../api/respondentRouter';
@@ -80,6 +80,8 @@ export async function startApiServer() {
         Sequence,
         Step,
         Question,
+        Task,
+        Logic,
         SequenceResponse,
         RespondentsList
     }, ['GET', 'POST', 'PATCH', 'DELETE'], ['GET', 'POST'], 'crud');
@@ -99,6 +101,8 @@ export async function startApiServer() {
         Project,
         Sequence,
         Question,
+        Task,
+        Logic,
         SequenceResponse,
         RespondentsList
     }, ['POST', 'GET'], [], 'data-op');
