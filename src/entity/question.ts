@@ -1,16 +1,13 @@
 import { AfterLoad, Column, Entity, JoinTable, ManyToOne, OneToMany, RelationId } from 'typeorm';
-import { Base } from '../base';
-import { QuestionAsset } from '../questionAsset';
-import { FormatConstraint } from '../formatConstraint';
-import { QuantityOrder } from '../enums/item.enums';
-import { ResponseAsset } from '../responseAsset';
-import { QuestionContentAsset } from '../questionContentAsset';
-import { enumerableColumnProperties } from '../../util/helpers';
-import { QuestionTransformer } from './transform';
-import { QuestionPresentationTypes } from '../enums/questionPresentationTypes.enums';
+import { Base } from './base';
+import { QuestionAsset } from './questionAsset';
+import { FormatConstraint } from './formatConstraint';
+import { QuantityOrder } from './enums/item.enums';
+import { ResponseAsset } from './responseAsset';
+import { QuestionContentAsset } from './questionContentAsset';
+import { enumerableColumnProperties } from '../util/helpers';
+import { QuestionPresentationTypes } from './enums/questionPresentationTypes.enums';
 
-
-const rules = new QuestionTransformer().rules;
 
 @Entity()
 export class Question extends Base {
@@ -105,21 +102,21 @@ export class Question extends Base {
     responseAssetsIds?: string[];
 
 
-    presentationType?: QuestionPresentationTypes;
-    @AfterLoad()
-    private async determinePresentationType?(next) {
-        const question = this;
-        question.presentationType = await new Promise<QuestionPresentationTypes>((resolve) => {
-            rules.execute(question, (d) => {
-                if (typeof d.presentationType === 'boolean') {
-                    throw new Error(`no presentation type found for question [${question.id}]`)
-                }
-                resolve(<QuestionPresentationTypes>d.presentationType);
-            });
-        });
-
-        return question;
-    }
+    // presentationType?: QuestionPresentationTypes;
+    // @AfterLoad()
+    // private async determinePresentationType?(next) {
+    //     const question = this;
+    //     question.presentationType = await new Promise<QuestionPresentationTypes>((resolve) => {
+    //         // rules.execute(question, (d) => {
+    //         //     if (typeof d.presentationType === 'boolean') {
+    //         //         throw new Error(`no presentation type found for question [${question.id}]`)
+    //         //     }
+    //         //     resolve(<QuestionPresentationTypes>d.presentationType);
+    //         // });
+    //     });
+    //
+    //     return question;
+    // }
 
 
 }

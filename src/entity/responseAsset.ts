@@ -1,6 +1,6 @@
 import { Entity, JoinColumn, ManyToOne, RelationId } from 'typeorm';
 import { AssetBase } from './assetBase';
-import { Question } from './question/entity';
+import { Question } from './question';
 
 
 @Entity()

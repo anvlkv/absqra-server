@@ -1,5 +1,5 @@
 import { AssetBase } from './assetBase';
-import { Question } from './question/entity';
+import { Question } from './question';
 import { Entity, ManyToOne, RelationId } from 'typeorm';
 
 

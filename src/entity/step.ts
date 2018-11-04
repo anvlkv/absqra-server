@@ -1,7 +1,7 @@
 import { Column, Entity, JoinTable, ManyToOne, OneToMany, RelationId } from 'typeorm';
 import { Sequence } from './sequence';
 import { StepTypes } from './enums/step.enums';
-import { Question } from './question/entity';
+import { Question } from './question';
 import { Task } from './task';
 import { Logic } from './logic';
 import { StepAsset } from './stepAsset';

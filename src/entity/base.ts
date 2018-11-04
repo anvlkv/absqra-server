@@ -5,13 +5,13 @@ import {
 
 export abstract class Base {
     @PrimaryGeneratedColumn('uuid')
-    id?: string;
+    readonly id?: string;
 
     @CreateDateColumn({type: 'timestamp with time zone'})
-    createdDate?: Date;
+    readonly createdDate?: Date;
 
     @UpdateDateColumn({type: 'timestamp with time zone'})
-    updatedDate?: Date;
+    readonly updatedDate?: Date;
 
     constructor(data?: any, skipKeys: string[] = []) {
         skipKeys = ['id', 'createdDate', 'updatedDate', ...skipKeys];
