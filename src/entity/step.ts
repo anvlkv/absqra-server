@@ -11,7 +11,7 @@ import { enumerableColumnProperties } from '../util/helpers';
 
 @Entity({
     orderBy: {
-        order: 'ASC'
+        order: `ASC`
     }
 })
 export class Step extends OrderableBase {

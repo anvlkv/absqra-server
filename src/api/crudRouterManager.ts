@@ -7,17 +7,54 @@ import * as pluralize from 'pluralize';
 export class CRUDRouterManager extends RouterManagerBase {
     get commandParamName(): string { return; }
 
+    private populateDefaults(meta: EntityMetadata, cyclicEntities: string[] = []): any {
+        const defaultEntity = {};
+        try {
+            if (meta.columns) {
+                meta.columns.forEach(column => {
+                    if (!column.isGenerated) {
+                        const findColumnType = (t) => t === column.type;
+                        const fallBackValue = (() => {
+                            if (['float', 'double', 'dec', 'decimal', 'numeric', 'real', 'double precision', 'number'].find(findColumnType)) {
+                                return 0
+                            }
+                            else if (['character varying', 'varying character', 'nvarchar', 'character', 'native character', 'varchar', 'char', 'nchar', 'varchar2', 'nvarchar2', 'tinytext', 'mediumtext', 'text', 'ntext', 'citext', 'longtext'].find(findColumnType)) {
+                                return ''
+                            }
+                            else {
+                                return null
+                            }
+                        })();
+
+                        defaultEntity[column.propertyName] = column.hasOwnProperty('default') ? column.default : fallBackValue;
+                    }
+                });
+            }
+            if (meta.relations) {
+                meta.relations.forEach(relation => {
+                    if (!cyclicEntities.find(n => n === (<any>relation).type.name)) {
+                        cyclicEntities.push((<any>relation).type.name);
+                        if (!relation.isNullable) {
+                            const defaultValue = this.populateDefaults(relation.inverseEntityMetadata, cyclicEntities);
+                            defaultEntity[relation.propertyName] = (relation.isOneToMany || relation.isManyToMany) ? [defaultValue] : defaultValue;
+                        }
+                        else {
+                            defaultEntity[relation.propertyName] = null;
+                        }
+                    }
+                });
+            }
+        } catch (e) {
+            console.error('creating default entity failed', e);
+        }
+
+        return defaultEntity;
+    }
+
     generateEntityMiddlewear(Repo, Entity, name, localPostfix): IMiddleware {
         return async (ctx, next) => {
             try {
                 const id = ctx.params[`${name}Id`];
-
-                // let parentId: string;
-                // const findOneOptions: FindOneOptions = {};
-                // if (parent) {
-                //     parentId = parent ? ctx.params[`${parent}Id`] : null;
-                //     findOneOptions.where = `"${parent}Id"='${parentId}'`
-                // }
 
                 if (id === 'default') {
                     ctx.body = this.populateDefaults(Repo.metadata);
@@ -38,14 +75,8 @@ export class CRUDRouterManager extends RouterManagerBase {
                             entry[key] = ctx.request.body[key];
                         }
 
-                        // if (parent) {
-                        //     // const saveResult =
-                        //     console.log(parent);
-                        // }
-                        // else {
-                            await Repo.save(entry);
-                            ctx.body = await Repo.findOne(id);
-                        // }
+                        await Repo.save(entry);
+                        ctx.body = await Repo.findOne(id);
                         break;
                     }
                     case 'PATCH': {
@@ -86,37 +117,6 @@ export class CRUDRouterManager extends RouterManagerBase {
                 RouterManagerBase.handleError(e, ctx, next, `entity${localPostfix}|${ctx.method}:${ctx.req.url}`);
             }
         };
-    }
-
-    private populateDefaults(meta: EntityMetadata, cyclicEntities: string[] = []): any {
-        const defaultEntity = {};
-        try {
-            if (meta.columns) {
-                meta.columns.forEach(column => {
-                    if (!column.isGenerated) {
-                        defaultEntity[column.propertyName] = column.hasOwnProperty('default') ? column.default : null;
-                    }
-                });
-            }
-            if (meta.relations) {
-                meta.relations.forEach(relation => {
-                    if (!cyclicEntities.find(n => n == (<any>relation).type.name)) {
-                        cyclicEntities.push((<any>relation).type.name);
-                        if (!relation.isNullable) {
-                            const defaultValue = this.populateDefaults(relation.inverseEntityMetadata, cyclicEntities);
-                            defaultEntity[relation.propertyName] = (relation.isOneToMany || relation.isManyToMany) ? [defaultValue] : defaultValue;
-                        }
-                        else {
-                            defaultEntity[relation.propertyName] = null;
-                        }
-                    }
-                });
-            }
-        } catch (e) {
-            console.error('creating default entity failed', e);
-        }
-
-        return defaultEntity;
     }
 
     generateRepoMiddlewear (Repo, Entity, name, localPostfix, localPluralizedPostfix): IMiddleware {
