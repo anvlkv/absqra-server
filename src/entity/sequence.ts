@@ -8,7 +8,7 @@ import { Project } from './project';
 
 @Entity({
     orderBy: {
-        updatedDate: 'DESC',
+        updatedDate: `DESC`,
     }
 })
 export class Sequence extends Base {
@@ -23,7 +23,8 @@ export class Sequence extends Base {
 
 
     @OneToMany(type => Step, step => step.sequence, {
-        cascade: true
+        cascade: true,
+        nullable: false
     })
     @JoinTable({
         name: 'sequence_steps',
@@ -39,7 +40,7 @@ export class Sequence extends Base {
     steps?: Step[];
 
     @RelationId((sequence: Sequence) => sequence.steps)
-    stepIds?: string[];
+    stepsIds?: string[];
 
     @ManyToMany(type => Step, step => step.sequenceReference)
     referencedBySteps?: Sequence[];

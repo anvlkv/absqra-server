@@ -114,19 +114,19 @@ export async function startApiServer() {
 
 
 
-    // keep at the end of stack...
-    const deadEnd = new Router();
-    deadEnd.register('**', ['GET', 'POST', 'PATCH', 'DELETE'], async (ctx, next) => {
-        await next();
-        if (!ctx.body) {
-            ctx.throw(404);
-            if (!environment.production) {
-                console.error(`404: Not found [${ctx.req.url}]`)
-            }
-        }
-    });
-    app.use(deadEnd.routes())
-        .use(deadEnd.allowedMethods());
+    // // keep at the end of stack...
+    // const deadEnd = new Router();
+    // deadEnd.register('**', ['GET', 'POST', 'PATCH', 'DELETE'], async (ctx, next) => {
+    //     await next();
+    //     if (!ctx.body) {
+    //         ctx.throw(404);
+    //         if (!environment.production) {
+    //             console.error(`404: Not found [${ctx.req.url}]`)
+    //         }
+    //     }
+    // });
+    // app.use(deadEnd.routes())
+    //     .use(deadEnd.allowedMethods());
 
     if (!environment.production) {
         exportRoutes(crudRouterManager.router, 'CRUDRouter');
